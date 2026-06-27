@@ -1,0 +1,5 @@
+terminals/
+mcps/
+.DS_Store
+Thumbs.db
+*.log

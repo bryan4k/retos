@@ -1,0 +1,228 @@
+const CHALLENGES_HTML = [
+  {
+    id: 'html-estructura-basica',
+    tech: 'html',
+    level: 'principiante',
+    title: 'Estructura básica de página',
+    scenario: null,
+    description: `
+      <p>Crea el esqueleto mínimo de una página HTML válida con <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code> con un <code>&lt;title&gt;</code>, y <code>&lt;body&gt;</code> con un párrafo de bienvenida.</p>
+    `,
+    learn: {
+      concept: 'Todo documento HTML necesita una estructura jerárquica para que el navegador lo interprete correctamente.',
+      whenToUse: 'Siempre que crees una página web. El DOCTYPE le dice al navegador qué versión de HTML usar; head contiene metadatos; body el contenido visible.'
+    },
+    starterCode: `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mi primera página</title>
+</head>
+<body>
+  <!-- Escribe un párrafo de bienvenida aquí -->
+  
+</body>
+</html>`,
+    tests: [
+      { type: 'exists', selector: 'html', name: 'Elemento html presente' },
+      { type: 'exists', selector: 'head title', name: 'Título en head' },
+      { type: 'exists', selector: 'body p', name: 'Párrafo en body' },
+      { type: 'text', selector: 'body p', contains: true, name: 'Párrafo con contenido' }
+    ],
+    hint: 'Dentro de <body> agrega <p>Bienvenido a mi sitio</p> o texto similar.',
+    feedback: {
+      general: {
+        why: 'HTML es un árbol de etiquetas anidadas. Si falta una etiqueta o está mal cerrada, el navegador no puede renderizar bien la página.',
+        fix: 'Verifica que cada etiqueta de apertura tenga su cierre y que title esté dentro de head, no de body.',
+        whenToUse: 'Usa esta estructura como plantilla base en todos tus proyectos web.'
+      }
+    }
+  },
+  {
+    id: 'html-nav-lista',
+    tech: 'html',
+    level: 'principiante',
+    title: 'Menú de navegación',
+    scenario: null,
+    description: `
+      <p>Crea un menú de navegación con <code>&lt;nav&gt;</code> que contenga una lista <code>&lt;ul&gt;</code> con al menos 3 enlaces <code>&lt;a&gt;</code> a secciones (pueden usar <code>href="#"</code>).</p>
+    `,
+    learn: {
+      concept: 'Las listas no ordenadas agrupan elementos relacionados; nav indica semánticamente una zona de navegación.',
+      whenToUse: 'En headers de sitios web, dashboards y apps con múltiples secciones. Mejora accesibilidad y SEO.'
+    },
+    starterCode: `<nav>
+  <!-- Crea una lista con al menos 3 enlaces -->
+  
+</nav>`,
+    tests: [
+      { type: 'exists', selector: 'nav', name: 'Elemento nav' },
+      { type: 'exists', selector: 'nav ul', name: 'Lista dentro de nav' },
+      { type: 'count', selector: 'nav a', min: 3, name: 'Al menos 3 enlaces' },
+      { type: 'exists', selector: 'nav li', name: 'Items de lista' }
+    ],
+    hint: 'Estructura: <nav><ul><li><a href="#">Inicio</a></li>...</ul></nav>',
+    feedback: {
+      general: {
+        why: 'Los enlaces sueltos sin lista son más difíciles de estilar y menos semánticos para lectores de pantalla.',
+        fix: 'Envuelve cada enlace en <li> dentro de un <ul> dentro de <nav>.',
+        whenToUse: 'Usa nav + ul para menús horizontales o verticales en cualquier sitio multipágina.'
+      }
+    }
+  },
+  {
+    id: 'html-formulario-contacto',
+    tech: 'html',
+    level: 'intermedio',
+    title: 'Formulario de contacto',
+    scenario: '🏢 Una empresa necesita captar leads en su landing page. Debes crear el formulario que enviará nombre, email y mensaje al CRM.',
+    description: `
+      <p>Construye un formulario de contacto profesional con:</p>
+      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
+        <li>Campo nombre con <code>label</code> asociado</li>
+        <li>Campo email con <code>type="email"</code> y <code>required</code></li>
+        <li>Área de mensaje con <code>textarea</code></li>
+        <li>Botón de envío</li>
+      </ul>
+    `,
+    learn: {
+      concept: 'Los formularios conectan al usuario con el backend. Labels asociados mejoran accesibilidad; types correctos activan validación nativa.',
+      whenToUse: 'Registro, login, contacto, checkout, encuestas. Siempre asocia label con input via for/id.'
+    },
+    starterCode: `<form id="contacto">
+  <!-- Nombre, email, mensaje y botón enviar -->
+  
+</form>`,
+    tests: [
+      { type: 'exists', selector: 'form#contacto', name: 'Formulario con id contacto' },
+      { type: 'exists', selector: 'label[for]', name: 'Label con atributo for' },
+      { type: 'exists', selector: 'input[type="email"][required]', name: 'Email requerido' },
+      { type: 'exists', selector: 'textarea', name: 'Área de mensaje' },
+      { type: 'exists', selector: 'button[type="submit"], input[type="submit"]', name: 'Botón enviar' }
+    ],
+    hint: 'Usa <label for="email">Email</label> y <input id="email" type="email" required>',
+    feedback: {
+      general: {
+        why: 'Sin labels ni types, el formulario falla en móvil, accesibilidad y validación automática del navegador.',
+        fix: 'Cada input necesita id único y su label con for igual. Email debe ser type="email" con required.',
+        whenToUse: 'Todo formulario público debe tener labels, types semánticos y validación HTML5 antes de enviar al servidor.'
+      }
+    }
+  },
+  {
+    id: 'html-tarjeta-producto',
+    tech: 'html',
+    level: 'intermedio',
+    title: 'Tarjeta de producto e-commerce',
+    scenario: '🛒 Tu tienda online muestra productos en grid. Cada tarjeta debe tener imagen, nombre, precio y botón de compra accesible.',
+    description: `
+      <p>Crea una tarjeta de producto usando etiquetas semánticas:</p>
+      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
+        <li><code>article</code> como contenedor</li>
+        <li><code>img</code> con <code>alt</code> descriptivo</li>
+        <li><code>h2</code> para el nombre del producto</li>
+        <li><code>p</code> con clase <code>precio</code> para el precio</li>
+        <li><code>button</code> con texto "Agregar al carrito"</li>
+      </ul>
+    `,
+    learn: {
+      concept: 'article representa contenido independiente y reutilizable. alt en imágenes es obligatorio para accesibilidad.',
+      whenToUse: 'Cards de blog, productos, noticias, testimonios. article ayuda a SEO y lectores de pantalla a delimitar bloques.'
+    },
+    starterCode: `<article class="producto">
+  <!-- Imagen, título, precio y botón -->
+  
+</article>`,
+    tests: [
+      { type: 'exists', selector: 'article.producto', name: 'Article con clase producto' },
+      { type: 'attribute', selector: 'article img', attr: 'alt', notEmpty: true, name: 'Imagen con alt' },
+      { type: 'exists', selector: 'article h2', name: 'Título del producto' },
+      { type: 'exists', selector: 'article .precio', name: 'Precio con clase' },
+      { type: 'text', selector: 'article button', expected: 'Agregar al carrito', name: 'Botón de compra' }
+    ],
+    hint: 'alt debe describir el producto, ej: alt="Zapatillas deportivas rojas"',
+    feedback: {
+      general: {
+        why: 'Las tiendas sin alt ni estructura semántica pierden ventas de usuarios con lector de pantalla y ranking en Google.',
+        fix: 'Usa article > img(alt) + h2 + p.precio + button. El alt describe la imagen, no diga solo "imagen".',
+        whenToUse: 'Patrón estándar en Amazon, Mercado Libre y cualquier catálogo de productos.'
+      }
+    }
+  },
+  {
+    id: 'html-landing-semantica',
+    tech: 'html',
+    level: 'avanzado',
+    title: 'Landing page semántica',
+    scenario: '🚀 Startup lanza producto. Necesitas una landing con header, sección hero, características y footer — todo semántico para SEO.',
+    description: `
+      <p>Construye la estructura de una landing usando:</p>
+      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
+        <li><code>header</code> con logo (texto) y nav</li>
+        <li><code>main</code> con <code>section#hero</code> (h1 + párrafo)</li>
+        <li><code>section#features</code> con al menos 2 <code>article</code></li>
+        <li><code>footer</code> con texto de copyright</li>
+      </ul>
+    `,
+    learn: {
+      concept: 'HTML5 semántico comunica la estructura lógica de la página a buscadores y tecnologías asistivas.',
+      whenToUse: 'Landings, blogs, documentación. Evita div-soup; usa header, main, section, article, footer.'
+    },
+    starterCode: `<!-- Estructura semántica completa de landing -->
+
+`,
+    tests: [
+      { type: 'exists', selector: 'header nav', name: 'Header con navegación' },
+      { type: 'exists', selector: 'main', name: 'Contenido principal' },
+      { type: 'exists', selector: 'section#hero h1', name: 'Hero con h1' },
+      { type: 'count', selector: 'section#features article', min: 2, name: 'Al menos 2 features' },
+      { type: 'exists', selector: 'footer', name: 'Footer presente' }
+    ],
+    hint: 'Solo una h1 por página, dentro de #hero. Features van en articles separados.',
+    feedback: {
+      general: {
+        why: 'Una página de solo divs funciona visualmente pero Google y screen readers no entienden la jerarquía.',
+        fix: 'Organiza: header > nav, main > section#hero + section#features > articles, footer.',
+        whenToUse: 'Toda página pública que quieras posicionar en buscadores debe usar landmarks semánticos.'
+      }
+    }
+  },
+  {
+    id: 'html-dashboard-accesible',
+    tech: 'html',
+    level: 'experto',
+    title: 'Dashboard accesible',
+    scenario: '🏥 Un hospital usa un dashboard interno. Debe ser usable con teclado y lectores de pantalla (WCAG).',
+    description: `
+      <p>Crea un dashboard accesible con:</p>
+      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
+        <li>Tabla con <code>caption</code>, <code>thead</code>, <code>tbody</code></li>
+        <li>Columnas con <code>th scope="col"</code></li>
+        <li>Botón con <code>aria-label</code> descriptivo</li>
+        <li>Enlace "Saltar al contenido" al inicio</li>
+      </ul>
+    `,
+    learn: {
+      concept: 'WCAG exige que la información no dependa solo del color y que todo sea navegable por teclado.',
+      whenToUse: 'Apps gubernamentales, salud, banca y cualquier producto con usuarios diversos. Accesibilidad es requisito legal en muchos países.'
+    },
+    starterCode: `<!-- Dashboard accesible con tabla de pacientes -->
+
+`,
+    tests: [
+      { type: 'exists', selector: 'a[href="#main"]', name: 'Skip link' },
+      { type: 'exists', selector: 'table caption', name: 'Caption en tabla' },
+      { type: 'exists', selector: 'th[scope="col"]', name: 'Headers de columna' },
+      { type: 'exists', selector: 'main#main', name: 'Main con id' },
+      { type: 'attribute', selector: 'button[aria-label]', attr: 'aria-label', notEmpty: true, name: 'Botón con aria-label' }
+    ],
+    hint: 'Skip link: <a href="#main">Saltar al contenido</a> y <main id="main">',
+    feedback: {
+      general: {
+        why: 'Tablas sin th/caption son ilegibles para screen readers; botones sin aria-label son anunciados solo como "botón".',
+        fix: 'Agrega caption que describa la tabla, th en cada columna, aria-label en acciones icon-only.',
+        whenToUse: 'Tablas de datos, dashboards admin, backoffice. Siempre prueba con Tab + lector de pantalla.'
+      }
+    }
+  }
+];

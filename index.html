@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeRetos — HTML, CSS, JavaScript y Python</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ═══════════════ PANTALLA INICIO ═══════════════ -->
+  <div id="screen-home" class="screen-home">
+    <div class="home-inner">
+      <div class="home-brand">
+        <div class="home-logo">
+          <svg width="48" height="48" viewBox="0 0 28 28" fill="none">
+            <rect width="28" height="28" rx="8" fill="url(#grad)"/>
+            <path d="M8 9l6 5-6 5V9zm6 0h6v10h-6V9z" fill="white"/>
+            <defs><linearGradient id="grad" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+          </svg>
+        </div>
+        <h1>CodeRetos</h1>
+        <p class="home-subtitle">Practica desarrollo web con escenarios del mundo real</p>
+        <p class="home-stats" id="home-stats">800 retos · 800 lecturas · 200 lógica</p>
+      </div>
+
+      <div class="home-cards">
+        <button class="home-card home-card-practice" id="enter-practice">
+          <span class="home-card-icon">✍️</span>
+          <h2>Escribir código</h2>
+          <p>Resuelve retos en el editor. Ejecuta tests y recibe feedback educativo cuando falles.</p>
+          <ul class="home-card-features">
+            <li>50 retos por nivel y tecnología</li>
+            <li>HTML, CSS, JavaScript y Python</li>
+            <li>Escenarios de e-commerce, banca, APIs…</li>
+          </ul>
+          <span class="home-card-cta">Entrar al editor →</span>
+        </button>
+
+        <button class="home-card home-card-reading" id="enter-reading">
+          <span class="home-card-icon">👁️</span>
+          <h2>Leer código</h2>
+          <p>Interpreta código ajeno sin ejecutarlo. Esencial para code reviews y debugging.</p>
+          <ul class="home-card-features">
+            <li>50 ejercicios por nivel y tecnología</li>
+            <li>Predice outputs y detecta patrones</li>
+            <li>Explicaciones al acertar o fallar</li>
+          </ul>
+          <span class="home-card-cta">Entrar a lectura →</span>
+        </button>
+
+        <button class="home-card home-card-logic" id="enter-logic">
+          <span class="home-card-icon">🧠</span>
+          <h2>Lógica de programación</h2>
+          <p>Escribe la solución en Python a partir del pseudocódigo PSeInt y ejecuta los tests.</p>
+          <ul class="home-card-features">
+            <li>50 ejercicios por nivel</li>
+            <li>Escribe la solución en Python</li>
+            <li>Ejecuta tests y recibe feedback</li>
+          </ul>
+          <span class="home-card-cta">Entrar a lógica →</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ APP: ESCRIBIR CÓDIGO ═══════════════ -->
+  <div id="app-practice" class="app-shell" hidden>
+    <header class="header header-practice">
+      <div class="header-left">
+        <button class="btn-back" id="practice-back" aria-label="Volver al inicio">← Inicio</button>
+        <div class="header-brand">
+          <span class="shell-badge practice-badge">✍️ Escribir código</span>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat"><span class="stat-value" id="practice-completed">0</span><span class="stat-label">Completados</span></div>
+        <div class="stat"><span class="stat-value" id="practice-total">0</span><span class="stat-label">En tus niveles</span></div>
+        <div class="progress-ring">
+          <svg viewBox="0 0 36 36"><path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path class="ring-fill" id="practice-ring" stroke-dasharray="0,100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg>
+          <span class="ring-text" id="practice-percent">0%</span>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" id="practice-sidebar">
+        <div class="sidebar-header"><h2>Retos de código</h2><button class="btn-icon sidebar-close" data-sidebar="practice-sidebar">✕</button></div>
+        <div class="search-box"><input type="search" id="practice-search" placeholder="Buscar reto..." autocomplete="off"></div>
+        <div class="filter-section">
+          <span class="filter-label">Niveles en tu plan</span>
+          <p class="filter-hint">Activa los niveles que quieres practicar</p>
+          <div class="level-plan" id="practice-level-plan"></div>
+        </div>
+        <p class="selection-hint" id="practice-plan-summary">4 niveles activos</p>
+        <div class="filter-section"><span class="filter-label">Filtrar tecnología</span><div class="tech-filters" id="practice-tech-filters"></div></div>
+        <div class="filter-section"><span class="filter-label">Filtrar nivel</span><div class="level-filters" id="practice-level-filters"></div></div>
+        <nav class="challenge-list" id="practice-challenge-list"></nav>
+      </aside>
+      <main class="workspace">
+        <div class="workspace-toolbar">
+          <button class="btn-icon menu-toggle" data-sidebar="practice-sidebar">☰</button>
+          <div class="challenge-meta">
+            <span class="tech-badge" id="practice-tech-badge">—</span>
+            <span class="level-badge" id="practice-level-badge">—</span>
+            <h2 id="practice-title">Selecciona un reto</h2>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn btn-ghost" id="practice-btn-learn" disabled>Aprende</button>
+            <button class="btn btn-ghost" id="practice-btn-hint" disabled>Pista</button>
+            <button class="btn btn-ghost" id="practice-btn-reset" disabled>Reiniciar</button>
+            <button class="btn btn-primary" id="practice-btn-run" disabled>Ejecutar tests</button>
+          </div>
+        </div>
+        <div class="panels">
+          <section class="panel panel-description">
+            <div class="panel-header"><h3>Descripción</h3></div>
+            <div class="panel-body" id="practice-description">
+              <div class="empty-state"><div class="empty-icon">🎯</div><p>Elige un reto del menú lateral.</p></div>
+            </div>
+          </section>
+          <section class="panel panel-editor">
+            <div class="panel-header"><h3>Editor</h3><span class="editor-lang" id="practice-editor-lang">—</span></div>
+            <div class="panel-body editor-wrap"><textarea id="code-editor"></textarea></div>
+          </section>
+          <section class="panel panel-preview" id="practice-preview" hidden>
+            <div class="panel-header"><h3>Vista previa</h3></div>
+            <div class="panel-body preview-wrap" id="practice-preview-content"></div>
+          </section>
+          <section class="panel panel-results">
+            <div class="panel-header"><h3>Resultados</h3><span class="results-summary" id="practice-results-summary"></span></div>
+            <div class="panel-body" id="practice-results">
+              <div class="empty-state small"><p>Ejecuta los tests para validar tu solución.</p></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ═══════════════ APP: LÓGICA DE PROGRAMACIÓN ═══════════════ -->
+  <div id="app-logic" class="app-shell" hidden>
+    <header class="header header-logic">
+      <div class="header-left">
+        <button class="btn-back" id="logic-back" aria-label="Volver al inicio">← Inicio</button>
+        <div class="header-brand">
+          <span class="shell-badge logic-badge">🧠 Lógica de programación</span>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat"><span class="stat-value" id="logic-completed">0</span><span class="stat-label">Completados</span></div>
+        <div class="stat"><span class="stat-value" id="logic-total">0</span><span class="stat-label">En tus niveles</span></div>
+        <div class="progress-ring">
+          <svg viewBox="0 0 36 36"><path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path class="ring-fill" id="logic-ring" stroke-dasharray="0,100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg>
+          <span class="ring-text" id="logic-percent">0%</span>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" id="logic-sidebar">
+        <div class="sidebar-header"><h2>Ejercicios de lógica</h2><button class="btn-icon sidebar-close" data-sidebar="logic-sidebar">✕</button></div>
+        <div class="search-box"><input type="search" id="logic-search" placeholder="Buscar ejercicio..." autocomplete="off"></div>
+        <div class="filter-section">
+          <span class="filter-label">Niveles en tu plan</span>
+          <p class="filter-hint">Activa los niveles que quieres practicar</p>
+          <div class="level-plan" id="logic-level-plan"></div>
+        </div>
+        <p class="selection-hint" id="logic-plan-summary">4 niveles activos</p>
+        <div class="filter-section"><span class="filter-label">Filtrar nivel</span><div class="level-filters" id="logic-level-filters"></div></div>
+        <nav class="challenge-list" id="logic-challenge-list"></nav>
+      </aside>
+      <main class="workspace">
+        <div class="workspace-toolbar">
+          <button class="btn-icon menu-toggle" data-sidebar="logic-sidebar">☰</button>
+          <div class="challenge-meta">
+            <span class="tech-badge logica" id="logic-tech-badge">Lógica</span>
+            <span class="level-badge" id="logic-level-badge">—</span>
+            <h2 id="logic-title">Selecciona un ejercicio</h2>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn btn-ghost" id="logic-btn-learn" disabled>Aprende</button>
+            <button class="btn btn-ghost" id="logic-btn-hint" disabled>Pista</button>
+            <button class="btn btn-ghost" id="logic-btn-reset" disabled>Reiniciar</button>
+            <button class="btn btn-primary" id="logic-btn-run" disabled>Ejecutar tests</button>
+          </div>
+        </div>
+        <div class="panels">
+          <section class="panel panel-description">
+            <div class="panel-header"><h3>Problema y pseudocódigo</h3></div>
+            <div class="panel-body" id="logic-description">
+              <div class="empty-state"><div class="empty-icon">🧠</div><p>Elige un ejercicio del menú lateral.</p></div>
+            </div>
+          </section>
+          <section class="panel panel-editor">
+            <div class="panel-header"><h3>Editor</h3><span class="editor-lang">Python</span></div>
+            <div class="panel-body editor-wrap"><textarea id="logic-editor"></textarea></div>
+          </section>
+          <section class="panel panel-results">
+            <div class="panel-header"><h3>Resultados</h3><span class="results-summary" id="logic-results-summary"></span></div>
+            <div class="panel-body" id="logic-results">
+              <div class="empty-state small"><p>Escribe tu solución y ejecuta los tests.</p></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ═══════════════ APP: LEER CÓDIGO ═══════════════ -->
+  <div id="app-reading" class="app-shell" hidden>
+    <header class="header header-reading">
+      <div class="header-left">
+        <button class="btn-back" id="reading-back" aria-label="Volver al inicio">← Inicio</button>
+        <div class="header-brand">
+          <span class="shell-badge reading-badge">👁️ Leer código</span>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat"><span class="stat-value" id="reading-completed">0</span><span class="stat-label">Completados</span></div>
+        <div class="stat"><span class="stat-value" id="reading-total">0</span><span class="stat-label">En tus niveles</span></div>
+        <div class="progress-ring">
+          <svg viewBox="0 0 36 36"><path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path class="ring-fill" id="reading-ring" stroke-dasharray="0,100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/></svg>
+          <span class="ring-text" id="reading-percent">0%</span>
+        </div>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" id="reading-sidebar">
+        <div class="sidebar-header"><h2>Ejercicios de lectura</h2><button class="btn-icon sidebar-close" data-sidebar="reading-sidebar">✕</button></div>
+        <div class="search-box"><input type="search" id="reading-search" placeholder="Buscar ejercicio..." autocomplete="off"></div>
+        <div class="filter-section">
+          <span class="filter-label">Niveles en tu plan</span>
+          <p class="filter-hint">Activa los niveles que quieres practicar</p>
+          <div class="level-plan" id="reading-level-plan"></div>
+        </div>
+        <p class="selection-hint" id="reading-plan-summary">4 niveles activos</p>
+        <div class="filter-section"><span class="filter-label">Filtrar tecnología</span><div class="tech-filters" id="reading-tech-filters"></div></div>
+        <div class="filter-section"><span class="filter-label">Filtrar nivel</span><div class="level-filters" id="reading-level-filters"></div></div>
+        <nav class="challenge-list" id="reading-challenge-list"></nav>
+      </aside>
+      <main class="workspace">
+        <div class="workspace-toolbar">
+          <button class="btn-icon menu-toggle" data-sidebar="reading-sidebar">☰</button>
+          <div class="challenge-meta">
+            <span class="tech-badge" id="reading-tech-badge">—</span>
+            <span class="level-badge" id="reading-level-badge">—</span>
+            <h2 id="reading-title">Selecciona un ejercicio</h2>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn btn-ghost" id="reading-btn-guide">Guía de lectura</button>
+            <button class="btn btn-primary" id="reading-btn-check" disabled>Verificar respuesta</button>
+          </div>
+        </div>
+        <div class="panels panels-reading">
+          <section class="panel panel-description">
+            <div class="panel-header"><h3>Contexto</h3></div>
+            <div class="panel-body" id="reading-context">
+              <div class="empty-state">
+                <div class="empty-icon">👁️</div>
+                <p>Lee el código sin ejecutarlo. Predice qué hace antes de verificar.</p>
+              </div>
+            </div>
+          </section>
+          <section class="panel panel-code-read">
+            <div class="panel-header"><h3 id="reading-code-title">Código a analizar</h3><span class="editor-lang" id="reading-code-lang">—</span></div>
+            <div class="panel-body"><pre class="code-read-block" id="reading-code"><code></code></pre></div>
+          </section>
+          <section class="panel panel-quiz">
+            <div class="panel-header"><h3>Tu respuesta</h3></div>
+            <div class="panel-body">
+              <p class="quiz-question" id="reading-question"></p>
+              <div class="quiz-options" id="reading-options"></div>
+            </div>
+          </section>
+          <section class="panel panel-results">
+            <div class="panel-header"><h3>Explicación</h3><span class="results-summary" id="reading-result-summary"></span></div>
+            <div class="panel-body" id="reading-explanation">
+              <div class="empty-state small"><p>Selecciona una opción y verifica para ver la explicación.</p></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="modal-overlay" id="hint-modal" hidden>
+    <div class="modal"><div class="modal-header"><h3>💡 Pista</h3><button class="btn-icon modal-close" data-close="hint-modal">✕</button></div><div class="modal-body" id="hint-content"></div></div>
+  </div>
+  <div class="modal-overlay" id="learn-modal" hidden>
+    <div class="modal"><div class="modal-header"><h3>📚 Aprende</h3><button class="btn-icon modal-close" data-close="learn-modal">✕</button></div><div class="modal-body" id="learn-content"></div></div>
+  </div>
+  <div class="modal-overlay" id="read-guide-modal" hidden>
+    <div class="modal"><div class="modal-header"><h3>📖 Cómo leer código</h3><button class="btn-icon modal-close" data-close="read-guide-modal">✕</button></div>
+      <div class="modal-body"><ol class="read-guide-list">
+        <li><strong>Contexto primero:</strong> ¿Qué problema resuelve este código?</li>
+        <li><strong>Línea a línea:</strong> Sigue cada variable. Anota valores en papel.</li>
+        <li><strong>Patrones:</strong> map, filter, flex, closures, async/await…</li>
+        <li><strong>Edge cases:</strong> ¿Qué pasa con 0, null, [] o ""?</li>
+        <li><strong>En el trabajo:</strong> Así lees PRs, debuggeas y haces onboarding.</li>
+      </ol></div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+  <script src="editor-hints.js"></script>
+  <script src="technologies.js"></script>
+  <script src="challenges-html.js"></script>
+  <script src="challenges-css.js"></script>
+  <script src="challenges-javascript.js"></script>
+  <script src="challenges-python.js"></script>
+  <script src="learn-content.js"></script>
+  <script src="glossary.js"></script>
+  <script src="challenge-generator.js"></script>
+  <script src="reading-generator.js"></script>
+  <script src="logic-generator.js"></script>
+  <script src="challenges.js"></script>
+  <script src="runners.js"></script>
+  <script src="logic-runner.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
