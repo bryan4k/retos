@@ -1,0 +1,25 @@
+{
+  "name": "retos",
+  "version": "1.0.0",
+  "description": "Plataforma web para practicar desarrollo web y lógica de programación con escenarios del mundo real, feedback educativo y progreso por niveles.",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "screenshots": "node docs/capture-screenshots.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bryan4k/retos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/bryan4k/retos/issues"
+  },
+  "homepage": "https://github.com/bryan4k/retos#readme"
+}

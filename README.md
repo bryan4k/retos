@@ -61,12 +61,27 @@ retos/
 
 ## Capturas
 
-Puedes añadir imágenes en una carpeta `docs/` y referenciarlas aquí:
+### Pantalla de inicio
 
-```markdown
-![Pantalla de inicio](docs/inicio.png)
-![Editor de código](docs/editor.png)
-![Lógica de programación](docs/logica.png)
+![Pantalla de inicio con las tres modalidades](docs/inicio.png)
+
+### Escribir código
+
+![Editor con reto, tests y vista previa](docs/escribir-codigo.png)
+
+### Leer código
+
+![Ejercicio de lectura con código y opciones](docs/leer-codigo.png)
+
+### Lógica de programación
+
+![Pseudocódigo PSeInt y editor Python](docs/logica.png)
+
+Para regenerar las capturas (con el servidor en `http://localhost:5500`):
+
+```powershell
+npx playwright install chromium
+node docs/capture-screenshots.mjs
 ```
 
 ## Despliegue
