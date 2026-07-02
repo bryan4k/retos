@@ -426,7 +426,7 @@ const ChallengeEnrich = (function () {
       if (b.requirements?.length) {
         parts.push('Requisitos:\n' + b.requirements.map((r) => `• ${stripHtml(r)}`).join('\n'));
       }
-      if (b.example) parts.push(`Ejemplo: ${stripHtml(b.example)}`);
+      if (b.structure) parts.push(`Guía: ${typeof b.structure === 'string' ? b.structure : stripHtml(b.structure)}`);
       if (b.deliverable) parts.push(`Éxito: ${stripHtml(b.deliverable)}`);
       if (c.tests?.length) parts.push(`Tests: ${c.tests.map((t) => t.name).join(', ')}.`);
       if (c.feedback?.general?.whenToUse) parts.push(`Cuándo usarlo: ${c.feedback.general.whenToUse}`);

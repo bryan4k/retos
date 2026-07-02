@@ -22,6 +22,10 @@ const ExerciseBriefs = (function () {
     return text ? `<p class="brief-example"><strong>Ejemplo:</strong> ${text}</p>` : '';
   }
 
+  function structureLine(text) {
+    return text ? `<p class="brief-structure"><strong>Guía de estructura:</strong> ${text}</p>` : '';
+  }
+
   function successLine(text) {
     return `<p class="brief-success"><strong>Criterio de éxito:</strong> ${text}</p>`;
   }
@@ -39,7 +43,7 @@ const ExerciseBriefs = (function () {
       problemLine(b.problem),
       objectiveLine(b.objective),
       b.requirements?.length ? `<p class="brief-req-title"><strong>Requisitos concretos:</strong></p>${steps(b.requirements)}` : '',
-      exampleLine(b.example),
+      structureLine(b.structure),
       successLine(b.deliverable)
     ]);
   }
@@ -180,6 +184,49 @@ const ExerciseBriefs = (function () {
     })
   };
 
+  const HTML_STRUCTURE = {
+    p: 'Redacta tú el texto: un párrafo con una oración completa sobre el servicio (envío, precio, disponibilidad, etc.).',
+    h1: 'Elige un título que identifique la pantalla o producto; debe ser el encabezado más importante de la vista.',
+    ul: 'Piensa en dos o más ítems del contexto y colócalos cada uno en su propio li dentro de un ul.',
+    a: 'Define un href con sentido (URL, ruta o #ancla) y un texto de enlace que invite a actuar; no uses div clicable.',
+    img: 'Elige un src (real o ficticio) y escribe un alt con tus palabras que describa qué se ve, sin poner solo "imagen".',
+    button: 'Indica la acción del flujo en el texto del botón y usa el type correcto (button o submit si va en form).',
+    input: 'Decide qué dato capturas (nombre, cantidad, búsqueda…) y asígnale type y name coherentes con ese dato.',
+    label: 'El for del label y el id del input deben coincidir; el texto del label explica qué debe escribir el usuario.',
+    div: 'Agrupa el bloque de contenido de la vista dentro de un div; puedes añadir una clase si ayuda a organizar.',
+    span: 'Dentro de un párrafo, envuelve solo la parte que quieres resaltar (precio, estado, badge) con span.',
+    form: 'El form envuelve los campos; incluye al menos un input con name. Piensa qué dato se enviaría al servidor.',
+    select: 'name identifica el campo; cada option representa una alternativa del contexto (talla, ciudad, categoría…).',
+    textarea: 'Usa name y un placeholder o texto inicial que invite a escribir un mensaje largo propio del escenario.',
+    table: 'thead/th nombran las columnas según los datos del contexto; tbody/tr/td muestran al menos una fila de ejemplo.',
+    thead: 'La fila de encabezado va en thead con th por columna; los datos van aparte en tbody.',
+    nav: 'Marca la zona de navegación con nav y enlaces a secciones relevantes; puedes usar lista ul > li > a.',
+    article: 'Cada ítem autónomo (producto, noticia) va en article con su título y un párrafo de contenido propio.',
+    section: 'Agrupa un tema con section, un encabezado h2/h3 y contenido relacionado; id opcional para anclas.',
+    footer: 'Cierra la página con información legal o de contacto; texto original (copyright, enlaces secundarios).',
+    header: 'Zona superior con marca o nombre del sitio; puede incluir nav si hay menú.',
+    main: 'Solo un main con el contenido central; sin nav ni footer dentro. Incluye al menos un encabezado o párrafo.',
+    aside: 'Contenido secundario (filtros, tips, enlaces relacionados) que no repita el contenido principal.',
+    figure: 'Agrupa img + figcaption: la leyenda explica la imagen con texto tuyo; img lleva alt descriptivo.',
+    figcaption: 'Dentro de figure, el figcaption resume en tus palabras qué muestra la ilustración.',
+    details: 'summary es el título clicable; el contenido expandible (p, ul…) responde la pregunta del contexto.',
+    summary: 'Escribe en summary la pregunta o título del panel; el detalle va debajo dentro del mismo details.',
+    fieldset: 'legend nombra el grupo al inicio; los inputs relacionados (radios, checkboxes) van dentro.',
+    legend: 'Como primer hijo de fieldset, legend indica qué opción o grupo elige el usuario.',
+    datalist: 'list del input y id del datalist deben coincidir; las option son sugerencias del dominio del reto.',
+    output: 'Muestra un valor calculado o de ejemplo con name; puede vivir dentro del form del escenario.',
+    dialog: 'Mensaje que explique la acción crítica y un control para cerrar o confirmar; open si debe verse al cargar.',
+    template: 'Guarda el markup reutilizable que JS clonará; no hace falta que sea visible en pantalla.',
+    slot: 'Marca dónde se proyectará contenido externo; name opcional para zonas nombradas del componente.',
+    picture: 'source ofrece formato alternativo; img es el fallback con alt obligatorio.',
+    source: 'Hijo de video o picture con src al archivo; type MIME ayuda al navegador a elegir formato.',
+    track: 'Hijo de video con kind subtitles o captions y src a un .vtt; srclang según el idioma del contenido.',
+    meter: 'value entre min y max representa el nivel; texto entre etiquetas como respaldo legible.',
+    progress: 'value y max expresan el avance (p. ej. subida de archivo); value no puede superar max.',
+    time: 'datetime en ISO para máquinas; entre etiquetas, texto legible para humanos con la fecha del escenario.',
+    address: 'Datos de contacto reales del contexto (dirección, email, teléfono); mailto:/tel: si aplica.'
+  };
+
   const HTML_BRIEFS = {
     p: (ctx) => ({
       title: 'Descripción visible del servicio',
@@ -191,7 +238,7 @@ const ExerciseBriefs = (function () {
         'El párrafo debe tener texto visible (no vacío).',
         'Usa una oración completa, por ejemplo sobre envío, precio o disponibilidad.'
       ],
-      example: `${fmt('<p>Entrega en 30 minutos en tu zona.</p>')}`,
+      structure: HTML_STRUCTURE.p,
       deliverable: 'El test confirma que existe un elemento p en el documento.'
     }),
     h1: (ctx) => ({
@@ -204,7 +251,7 @@ const ExerciseBriefs = (function () {
         'Debe ser el título más importante de la vista (no uses h1 dentro de un card pequeño).',
         'Una sola palabra o frase corta es válida.'
       ],
-      example: `${fmt('<h1>Menú del día</h1>')}`,
+      structure: HTML_STRUCTURE.h1,
       deliverable: 'El test detecta el elemento h1 en tu markup.'
     }),
     ul: (ctx) => ({
@@ -217,7 +264,7 @@ const ExerciseBriefs = (function () {
         `Cada ítem va dentro de ${fmt('<li>')}.`,
         'Mínimo dos elementos de lista con texto.'
       ],
-      example: `${fmt('<ul><li>Envío gratis</li><li>Pago seguro</li></ul>')}`,
+      structure: HTML_STRUCTURE.ul,
       deliverable: 'El test verifica que existe ul en el HTML.'
     }),
     a: (ctx) => ({
@@ -226,11 +273,11 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} hay texto que parece enlace pero no es clicable porque falta un ${fmt('<a href="...">')} válido.`,
       objective: `Crear un enlace ${fmt('<a>')} con atributo ${fmt('href')} no vacío que lleve a una URL o ancla.`,
       requirements: [
-        `Incluir ${fmt('<a href="...">')} con texto visible.`,
-        `${fmt('href')} debe tener valor (URL, #seccion o /ruta).`,
+        'Incluir un enlace a con texto visible.',
+        'href debe tener valor (URL, #seccion o /ruta).',
         'No uses div con onclick; usa enlace real.'
       ],
-      example: `${fmt('<a href="https://ejemplo.com/pedir">Hacer pedido</a>')}`,
+      structure: HTML_STRUCTURE.a,
       deliverable: 'Los tests exigen a con href definido.'
     }),
     img: (ctx) => ({
@@ -239,11 +286,11 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} se muestra una foto sin ${fmt('alt')}; usuarios con lector de pantalla no saben qué representa.`,
       objective: `Insertar ${fmt('<img>')} con ${fmt('src')} y ${fmt('alt')} descriptivo del contenido visual.`,
       requirements: [
-        `Etiqueta ${fmt('<img src="..." alt="...">')}.`,
-        `${fmt('alt')} describe la imagen, no digas solo "imagen".`,
-        `${fmt('src')} apunta a una ruta o URL (puede ser de ejemplo).`
+        'Usa la etiqueta img con atributos src y alt.',
+        'alt describe la imagen con tus palabras, no pongas solo "imagen".',
+        'src puede ser una ruta o URL ficticia del escenario.'
       ],
-      example: `${fmt('<img src="plato.jpg" alt="Ensalada César con pollo">')}`,
+      structure: HTML_STRUCTURE.img,
       deliverable: 'El test busca img[alt] presente en el DOM.'
     }),
     button: (ctx) => ({
@@ -252,11 +299,11 @@ const ExerciseBriefs = (function () {
       problem: `El flujo de ${ctx} necesita un botón para confirmar (pedir, guardar, continuar) pero no existe en el HTML.`,
       objective: `Agregar ${fmt('<button>')} con ${fmt('type')} y texto que indique la acción.`,
       requirements: [
-        `Usar ${fmt('<button type="button">')} o ${fmt('type="submit"')} si va en formulario.`,
+        'Usa button con type adecuado (button o submit si va en formulario).',
         'Texto visible dentro del botón.',
         'No uses div estilizado como botón.'
       ],
-      example: `${fmt('<button type="button">Confirmar pedido</button>')}`,
+      structure: HTML_STRUCTURE.button,
       deliverable: 'El test confirma que hay un button en el documento.'
     }),
     input: (ctx) => ({
@@ -265,11 +312,11 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} el usuario debe escribir un dato (nombre, cantidad, búsqueda) pero no hay campo de entrada.`,
       objective: `Añadir ${fmt('<input>')} con ${fmt('type')} y ${fmt('name')} para capturar un dato.`,
       requirements: [
-        `Incluir ${fmt('<input type="text" name="...">')} o type adecuado (email, number).`,
+        'Incluir input con type y name según el dato que capturas.',
         'Define name para que el dato sea identificable.',
         'Puede ir solo o dentro de un form.'
       ],
-      example: `${fmt('<input type="text" name="busqueda" placeholder="Buscar producto">')}`,
+      structure: HTML_STRUCTURE.input,
       deliverable: 'El test verifica presencia de input.'
     }),
     label: (ctx) => ({
@@ -278,11 +325,11 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} hay inputs sin etiqueta; al tocar el texto el campo no se enfoca y lectores de pantalla no anuncian el propósito.`,
       objective: `Crear ${fmt('<label>')} asociado a un campo con ${fmt('for')} igual al ${fmt('id')} del input.`,
       requirements: [
-        `Incluir ${fmt('<label for="id-del-campo">')} con texto claro.`,
+        'Incluir label con for que apunte al id del campo.',
         'El input relacionado debe existir con el mismo id.',
         'El label describe qué debe escribir el usuario.'
       ],
-      example: `${fmt('<label for="email">Correo</label><input id="email" type="email">')}`,
+      structure: HTML_STRUCTURE.label,
       deliverable: 'El test confirma que existe label en el HTML.'
     }),
     div: (ctx) => ({
@@ -295,7 +342,7 @@ const ExerciseBriefs = (function () {
         'Puede tener clase para estilos (ej. class="card").',
         'Coloca dentro el contenido de la sección.'
       ],
-      example: `${fmt('<div class="resumen"><p>Total: $120</p></div>')}`,
+      structure: HTML_STRUCTURE.div,
       deliverable: 'El test detecta el elemento div.'
     }),
     span: (ctx) => ({
@@ -308,7 +355,7 @@ const ExerciseBriefs = (function () {
         'Normalmente va dentro de un p u otro elemento de texto.',
         'Puede llevar class para estilo (ej. class="precio").'
       ],
-      example: `${fmt('<p>Precio: <span class="precio">$49</span></p>')}`,
+      structure: HTML_STRUCTURE.span,
       deliverable: 'El test verifica que span está presente.'
     }),
     form: (ctx) => ({
@@ -321,7 +368,7 @@ const ExerciseBriefs = (function () {
         'Al menos un input dentro del form.',
         'Opcional: action y method; para el test basta la estructura.'
       ],
-      example: `${fmt('<form><input type="text" name="usuario"></form>')}`,
+      structure: HTML_STRUCTURE.form,
       deliverable: 'Tests: form presente e input dentro del form.'
     }),
     select: (ctx) => ({
@@ -330,11 +377,11 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} hay que elegir una opción (talla, ciudad, categoría) pero solo hay texto estático.`,
       objective: `Implementar ${fmt('<select>')} con al menos una ${fmt('<option>')} seleccionable.`,
       requirements: [
-        `Incluir ${fmt('<select name="...">')}.`,
-        'Al menos una option con value o texto.',
-        'name ayuda a identificar el campo al enviar.'
+        'Incluir select con name que identifique el campo.',
+        'Al menos una option con value o texto propio del contexto.',
+        'Cada option representa una alternativa del escenario.'
       ],
-      example: `${fmt('<select name="talla"><option value="m">Mediana</option></select>')}`,
+      structure: HTML_STRUCTURE.select,
       deliverable: 'El test confirma select en el documento.'
     }),
     textarea: (ctx) => ({
@@ -343,11 +390,11 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} el usuario necesita escribir un comentario, dirección o nota de varias líneas y un input de una línea no alcanza.`,
       objective: `Agregar ${fmt('<textarea>')} con ${fmt('name')} para texto multilínea.`,
       requirements: [
-        `Usar ${fmt('<textarea name="...">')}.`,
-        'Puede tener placeholder o texto inicial.',
+        'Usar textarea con name definido.',
+        'Puede tener placeholder o texto inicial tuyo.',
         'Cierra correctamente la etiqueta textarea.'
       ],
-      example: `${fmt('<textarea name="mensaje" placeholder="Escribe tu comentario"></textarea>')}`,
+      structure: HTML_STRUCTURE.textarea,
       deliverable: 'El test verifica textarea presente.'
     }),
     table: (ctx) => ({
@@ -356,11 +403,11 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} hay que listar filas de datos (pedidos, inventario, usuarios) pero se muestran sin tabla accesible.`,
       objective: `Crear ${fmt('<table>')} con ${fmt('<thead>')}, ${fmt('<th>')} y al menos una fila en ${fmt('<tbody>')}.`,
       requirements: [
-        `Estructura: ${fmt('table > thead > tr > th')}.`,
-        `Incluir ${fmt('tbody')} con al menos un ${fmt('tr')}.`,
-        'Los th describen las columnas.'
+        'Estructura: table con thead (th por columna) y tbody con filas de datos.',
+        'Incluir al menos una fila tr en tbody.',
+        'Los th nombran las columnas según el contexto.'
       ],
-      example: `${fmt('<table><thead><tr><th>Producto</th></tr></thead><tbody><tr><td>Leche</td></tr></tbody></table>')}`,
+      structure: HTML_STRUCTURE.table,
       deliverable: 'Tests: table, th y estructura válida.'
     }),
     thead: (ctx) => ({
@@ -373,7 +420,7 @@ const ExerciseBriefs = (function () {
         'Al menos una columna nombrada en th.',
         'Datos de ejemplo en tbody.'
       ],
-      example: `${fmt('<table><thead><tr><th>Fecha</th><th>Total</th></tr></thead><tbody><tr><td>Hoy</td><td>100</td></tr></tbody></table>')}`,
+      structure: HTML_STRUCTURE.thead,
       deliverable: 'El test busca th dentro de la tabla.'
     }),
     nav: (ctx) => ({
@@ -386,7 +433,7 @@ const ExerciseBriefs = (function () {
         'Al menos un enlace a dentro.',
         'Recomendado: ul > li > a para menús.'
       ],
-      example: `${fmt('<nav><a href="#">Inicio</a><a href="#catalogo">Catálogo</a></nav>')}`,
+      structure: HTML_STRUCTURE.nav,
       deliverable: 'El test confirma nav presente.'
     }),
     article: (ctx) => ({
@@ -399,7 +446,7 @@ const ExerciseBriefs = (function () {
         'Incluir encabezado y párrafo de contenido.',
         'Un article por ítem (producto, entrada de blog).'
       ],
-      example: `${fmt('<article><h2>Promo verano</h2><p>20% en bebidas</p></article>')}`,
+      structure: HTML_STRUCTURE.article,
       deliverable: 'El test detecta article en el HTML.'
     }),
     section: (ctx) => ({
@@ -412,7 +459,7 @@ const ExerciseBriefs = (function () {
         'Contenido relacionado dentro de la misma section.',
         'Puede tener id para anclas (id="ofertas").'
       ],
-      example: `${fmt('<section id="ofertas"><h2>Ofertas</h2><p>Hasta 50% hoy</p></section>')}`,
+      structure: HTML_STRUCTURE.section,
       deliverable: 'El test verifica section presente.'
     }),
     footer: (ctx) => ({
@@ -425,7 +472,7 @@ const ExerciseBriefs = (function () {
         'Texto visible (© año, nombre empresa, enlace).',
         'No confundir con footer de un card; es el pie de la página.'
       ],
-      example: `${fmt('<footer><p>© 2026 Mi Tienda · <a href="#">Privacidad</a></p></footer>')}`,
+      structure: HTML_STRUCTURE.footer,
       deliverable: 'El test confirma footer en el documento.'
     }),
     header: (ctx) => ({
@@ -438,7 +485,7 @@ const ExerciseBriefs = (function () {
         'Incluir título o texto de marca.',
         'Puede contener nav con enlaces.'
       ],
-      example: `${fmt('<header><h1>FreshFood</h1><nav><a href="#">Menú</a></nav></header>')}`,
+      structure: HTML_STRUCTURE.header,
       deliverable: 'El test detecta header.'
     }),
     main: (ctx) => ({
@@ -451,7 +498,7 @@ const ExerciseBriefs = (function () {
         'No pongas navegación ni footer dentro de main.',
         'Incluye al menos un encabezado o párrafo dentro.'
       ],
-      example: `${fmt('<main><h1>Panel</h1><p>Resumen del día</p></main>')}`,
+      structure: HTML_STRUCTURE.main,
       deliverable: 'El test verifica main presente.'
     }),
     aside: (ctx) => ({
@@ -464,7 +511,7 @@ const ExerciseBriefs = (function () {
         'Título opcional con h2/h3.',
         'No repitas todo el contenido principal aquí.'
       ],
-      example: `${fmt('<aside><h3>Filtros</h3><ul><li>Ofertas</li></ul></aside>')}`,
+      structure: HTML_STRUCTURE.aside,
       deliverable: 'El test confirma aside.'
     }),
     figure: (ctx) => ({
@@ -477,7 +524,7 @@ const ExerciseBriefs = (function () {
         'figcaption describe la imagen.',
         'img con alt descriptivo.'
       ],
-      example: `${fmt('<figure><img src="graf.jpg" alt="Ventas marzo"><figcaption>Picos los viernes</figcaption></figure>')}`,
+      structure: HTML_STRUCTURE.figure,
       deliverable: 'El test verifica figure.'
     }),
     figcaption: (ctx) => ({
@@ -486,7 +533,7 @@ const ExerciseBriefs = (function () {
       problem: `La ilustración en ${ctx} se entiende mal sin texto debajo que explique qué muestra.`,
       objective: `Incluir ${fmt('<figcaption>')} dentro de un ${fmt('<figure>')} junto a una imagen.`,
       requirements: ['Estructura figure > img + figcaption.', 'Texto en figcaption no vacío.'],
-      example: `${fmt('<figure><img src="x.png" alt="Mapa"><figcaption>Distribución por zona</figcaption></figure>')}`,
+      structure: HTML_STRUCTURE.figcaption,
       deliverable: 'El test detecta figcaption dentro del patrón figure.'
     }),
     details: (ctx) => ({
@@ -499,7 +546,7 @@ const ExerciseBriefs = (function () {
         'Contenido adicional dentro de details (p, ul).',
         'summary resume la sección.'
       ],
-      example: `${fmt('<details><summary>¿Horario?</summary><p>Lun–Vie 9–18h</p></details>')}`,
+      structure: HTML_STRUCTURE.details,
       deliverable: 'El test verifica details.'
     }),
     summary: (ctx) => ({
@@ -508,7 +555,7 @@ const ExerciseBriefs = (function () {
       problem: `El panel colapsable de ${ctx} no tiene texto en el encabezado clicable.`,
       objective: `Dentro de ${fmt('<details>')}, escribir ${fmt('<summary>')} con la pregunta o título del bloque.`,
       requirements: ['details > summary con texto.', 'Contenido expandible debajo.'],
-      example: `${fmt('<details><summary>Ver política de devoluciones</summary><p>30 días</p></details>')}`,
+      structure: HTML_STRUCTURE.summary,
       deliverable: 'El test confirma summary presente.'
     }),
     fieldset: (ctx) => ({
@@ -521,7 +568,7 @@ const ExerciseBriefs = (function () {
         `${fmt('legend')} describe el grupo al inicio.`,
         'Al menos un input dentro.'
       ],
-      example: `${fmt('<fieldset><legend>Método de pago</legend><input type="radio" name="pago"> Tarjeta</fieldset>')}`,
+      structure: HTML_STRUCTURE.fieldset,
       deliverable: 'El test verifica fieldset.'
     }),
     legend: (ctx) => ({
@@ -530,7 +577,7 @@ const ExerciseBriefs = (function () {
       problem: `Los usuarios no saben qué pregunta responden los radios de ${ctx} porque falta leyenda del grupo.`,
       objective: `Colocar ${fmt('<legend>')} como primer hijo de ${fmt('<fieldset>')} nombrando el grupo.`,
       requirements: ['fieldset con legend al inicio.', 'Inputs del mismo grupo dentro.'],
-      example: `${fmt('<fieldset><legend>Talla</legend><input name="talla" type="radio"> S</fieldset>')}`,
+      structure: HTML_STRUCTURE.legend,
       deliverable: 'El test detecta legend.'
     }),
     datalist: (ctx) => ({
@@ -543,7 +590,7 @@ const ExerciseBriefs = (function () {
         'datalist con al menos una option.',
         'ids deben coincidir.'
       ],
-      example: `${fmt('<input list="ciudades"><datalist id="ciudades"><option value="Lima"></datalist>')}`,
+      structure: HTML_STRUCTURE.datalist,
       deliverable: 'El test verifica datalist.'
     }),
     output: (ctx) => ({
@@ -556,7 +603,7 @@ const ExerciseBriefs = (function () {
         'Puede ir dentro de form.',
         'name permite asociarlo a scripts después.'
       ],
-      example: `${fmt('<form oninput="o.value = 100"><output name="total">100</output></form>')}`,
+      structure: HTML_STRUCTURE.output,
       deliverable: 'El test confirma output.'
     }),
     dialog: (ctx) => ({
@@ -569,7 +616,7 @@ const ExerciseBriefs = (function () {
         'Texto que explique la acción.',
         'Botón para cerrar o confirmar.'
       ],
-      example: `${fmt('<dialog open><p>¿Eliminar pedido?</p><button>Cancelar</button></dialog>')}`,
+      structure: HTML_STRUCTURE.dialog,
       deliverable: 'El test verifica dialog.'
     }),
     template: (ctx) => ({
@@ -580,9 +627,9 @@ const ExerciseBriefs = (function () {
       requirements: [
         `${fmt('<template>')} con HTML válido dentro.`,
         'Contenido no visible hasta que JS lo use.',
-        'Ejemplo: card de producto o fila de tabla.'
+        'Puede ser el patrón de una card de producto o una fila de tabla (tú eliges el contenido).'
       ],
-      example: `${fmt('<template id="card"><article><h2></h2></article></template>')}`,
+      structure: HTML_STRUCTURE.template,
       deliverable: 'El test detecta template.'
     }),
     slot: (ctx) => ({
@@ -595,7 +642,7 @@ const ExerciseBriefs = (function () {
         'Opcional: slot name="footer" para zonas nombradas.',
         'Puede ir en template de componente.'
       ],
-      example: `${fmt('<div class="card"><slot name="titulo"></slot><slot></slot></div>')}`,
+      structure: HTML_STRUCTURE.slot,
       deliverable: 'El test verifica slot.'
     }),
     picture: (ctx) => ({
@@ -608,7 +655,7 @@ const ExerciseBriefs = (function () {
         'img con alt obligatorio.',
         'source con srcset o type (webp).'
       ],
-      example: `${fmt('<picture><source srcset="f.webp" type="image/webp"><img src="f.jpg" alt="Banner"></picture>')}`,
+      structure: HTML_STRUCTURE.picture,
       deliverable: 'El test verifica picture.'
     }),
     source: (ctx) => ({
@@ -621,7 +668,7 @@ const ExerciseBriefs = (function () {
         'Elemento padre video o picture.',
         'type MIME opcional (video/mp4).'
       ],
-      example: `${fmt('<video controls><source src="clip.mp4" type="video/mp4"></video>')}`,
+      structure: HTML_STRUCTURE.source,
       deliverable: 'El test detecta source.'
     }),
     track: (ctx) => ({
@@ -634,7 +681,7 @@ const ExerciseBriefs = (function () {
         'kind="subtitles" o "captions".',
         'src apunta a archivo .vtt (puede ser ejemplo).'
       ],
-      example: `${fmt('<video><track kind="subtitles" src="subs.vtt" srclang="es"></video>')}`,
+      structure: HTML_STRUCTURE.track,
       deliverable: 'El test verifica track.'
     }),
     meter: (ctx) => ({
@@ -647,7 +694,7 @@ const ExerciseBriefs = (function () {
         'Texto entre etiquetas como fallback.',
         'value dentro del rango min–max.'
       ],
-      example: `${fmt('<meter value="0.6" min="0" max="1">60% usado</meter>')}`,
+      structure: HTML_STRUCTURE.meter,
       deliverable: 'El test confirma meter.'
     }),
     progress: (ctx) => ({
@@ -660,7 +707,7 @@ const ExerciseBriefs = (function () {
         'value ≤ max.',
         'Texto fallback opcional entre etiquetas.'
       ],
-      example: `${fmt('<progress value="40" max="100">40%</progress>')}`,
+      structure: HTML_STRUCTURE.progress,
       deliverable: 'El test verifica progress.'
     }),
     time: (ctx) => ({
@@ -673,7 +720,7 @@ const ExerciseBriefs = (function () {
         'Texto visible amigable para humanos.',
         'Una fecha o hora concreta.'
       ],
-      example: `${fmt('<time datetime="2026-03-15">15 de marzo de 2026</time>')}`,
+      structure: HTML_STRUCTURE.time,
       deliverable: 'El test detecta time.'
     }),
     address: (ctx) => ({
@@ -686,7 +733,7 @@ const ExerciseBriefs = (function () {
         'Puede incluir enlace mailto: o tel:.',
         'No uses address para direcciones postales en mera mención literaria.'
       ],
-      example: `${fmt('<address>Av. Principal 123<br><a href="mailto:info@tienda.com">info@tienda.com</a></address>')}`,
+      structure: HTML_STRUCTURE.address,
       deliverable: 'El test confirma address.'
     })
   };
@@ -852,7 +899,7 @@ const ExerciseBriefs = (function () {
         `Incluir al menos un ${fmt(`<${tag}>`)} válido en el HTML.`,
         'Revisa si el test pide atributos como href, alt, name o type.'
       ],
-      example: null,
+      structure: HTML_STRUCTURE[tag] || `Piensa qué contenido del escenario necesita ${fmt(`<${tag}>`)} y redáctalo tú; no copies markup listo del enunciado.`,
       deliverable: `Los tests confirman que ${fmt(`<${tag}>`)} está presente en el documento.`
     };
   }

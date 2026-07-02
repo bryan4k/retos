@@ -121,6 +121,7 @@ body {
 .brief-problem,
 .brief-objective,
 .brief-example,
+.brief-structure,
 .brief-success,
 .brief-req-title {
   margin: 0 0 0.625rem;
@@ -132,6 +133,12 @@ body {
 
 .brief-objective {
   color: var(--accent-hover);
+}
+
+.brief-structure {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-style: italic;
 }
 
 .brief-req-title {
