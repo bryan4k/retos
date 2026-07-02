@@ -128,11 +128,17 @@ const ChallengeGenerator = (function () {
         tests = [{ name: 'Función definida', custom: true, run: (fn, a) => a(typeof fn === 'function', 'Implementa el patrón') }];
       }
 
+      const brief = ExerciseBriefs.practice({
+        tech: 'javascript', level, ctx, functionName, tests, title: b.t,
+        op: b.op, items: b.items, filter: b.filter, avg: b.avg, email: b.email, fmt: b.fmt,
+        sampleTest: b.test, sampleExp: level === 'principiante' ? tests[0]?.expected : undefined
+      });
+
       list.push({
         id, tech: 'javascript', level, title: `${b.t} #${i + 1}`,
-        scenario,
-        description: `<p>Implementa <code>${functionName}()</code> para resolver un caso de <strong>${ctx}</strong>.</p>`,
-        learn: makeLearn('javascript', level, `${b.t} #${i + 1}`, scenario, ctx),
+        scenario: brief.scenario || scenario,
+        description: brief.description,
+        learn: makeLearn('javascript', level, `${b.t} #${i + 1}`, brief.scenario || scenario, ctx),
         starterCode, functionName, tests,
         hint: 'Lee el escenario y piensa en el caso de negocio antes de codear.',
         feedback: { general: fb('El resultado no coincide.', 'Depura con console.log paso a paso.', 'Revisa la lógica paso a paso antes de optimizar.') }
@@ -196,11 +202,16 @@ const ChallengeGenerator = (function () {
         tests = [{ name: 'Función definida', custom: true, run: (fn, a) => a(callable(fn), 'Define la función') }];
       }
 
+      const brief = ExerciseBriefs.practice({
+        tech: 'python', level, ctx, functionName, tests, title: b.fn,
+        desc: b.desc, code: b.code, fnKey: b.fn
+      });
+
       list.push({
         id, tech: 'python', level, title: `${b.fn.replace(/_/g, ' ')} #${i + 1}`,
-        scenario,
-        description: `<p>En <strong>${ctx}</strong>, implementa <code>${functionName}()</code>. ${b.desc || ''}</p>`,
-        learn: makeLearn('python', level, `${b.fn.replace(/_/g, ' ')} #${i + 1}`, scenario, ctx),
+        scenario: brief.scenario || scenario,
+        description: brief.description,
+        learn: makeLearn('python', level, `${b.fn.replace(/_/g, ' ')} #${i + 1}`, brief.scenario || scenario, ctx),
         starterCode, functionName, tests,
         hint: 'Python usa indentación de 4 espacios. No olvides return.',
         feedback: { general: fb('Error de lógica o sintaxis.', 'Revisa indentación y tipos.', 'Valida tipos y casos borde.') }
@@ -234,12 +245,14 @@ const ChallengeGenerator = (function () {
       if (tag === 'form') tests.push({ type: 'exists', selector: 'input', name: 'Input en form' });
       if (tag === 'table') tests.push({ type: 'exists', selector: 'th', name: 'Headers tabla' });
 
+      const brief = ExerciseBriefs.practice({ tech: 'html', level, ctx, tag, tests });
+
       list.push({
         id, tech: 'html', level,
         title: `Usar <${tag}> en ${ctx.split(' ').slice(-2).join(' ')} #${i + 1}`,
-        scenario,
-        description: `<p>Para <strong>${ctx}</strong>, crea markup correcto usando <code>&lt;${tag}&gt;</code> con buenas prácticas.</p>`,
-        learn: makeLearn('html', level, `Usar <${tag}> #${i + 1}`, scenario, ctx),
+        scenario: brief.scenario || scenario,
+        description: brief.description,
+        learn: makeLearn('html', level, `Usar <${tag}> #${i + 1}`, brief.scenario || scenario, ctx),
         starterCode: `<!-- Maqueta para ${ctx} usando <${tag}>\n\n-->`,
         tests,
         hint: `Investiga cuándo usar <${tag}> y sus atributos obligatorios.`,
@@ -320,12 +333,14 @@ const ChallengeGenerator = (function () {
       else if (b.css) tests = [{ type: 'cssContains', value: b.p || b.css, name: 'Regla CSS' }];
       else tests = [{ type: 'cssContains', value: b.p, name: b.p }];
 
+      const brief = ExerciseBriefs.practice({ tech: 'css', level, ctx, sel, prop: b.p, tests });
+
       list.push({
         id, tech: 'css', level,
         title: `Estilo ${b.p} para ${ctx.split(' ').pop()} #${i + 1}`,
-        scenario,
-        description: `<p>En el diseño de <strong>${ctx}</strong>, aplica <code>${b.p}</code> correctamente.</p>`,
-        learn: makeLearn('css', level, `Estilo ${b.p} #${i + 1}`, scenario, ctx),
+        scenario: brief.scenario || scenario,
+        description: brief.description,
+        learn: makeLearn('css', level, `Estilo ${b.p} #${i + 1}`, brief.scenario || scenario, ctx),
         htmlScaffold: scaffold,
         starterCode: `${sel} {\n  /* Aplica ${b.p} */\n  \n}`,
         tests,

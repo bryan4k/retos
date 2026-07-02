@@ -700,12 +700,13 @@
 
     const scenario = c.scenario ? `<div class="scenario-banner">${escapeHtml(c.scenario)}</div>` : '';
     const learn = c.learn ? `<div class="learn-block learn-block-full">${LearnContent.renderHtml(c.learn)}</div>` : '';
-    const problem = `<div class="problem-block"><h4>📋 Problema</h4><p>${escapeHtml(c.problem)}</p></div>`;
-    const approach = `<div class="approach-block"><h4>🧭 Cómo resolverlo</h4><p>${escapeHtml(c.approach)}</p></div>`;
+    const brief = c.description ? `<div class="exercise-brief-panel">${c.description}</div>` : '';
+    const problem = `<div class="problem-block"><h4>📋 Enunciado</h4><p>${escapeHtml(c.problem)}</p></div>`;
+    const approach = `<div class="approach-block"><h4>🧭 Estrategia</h4><p>${escapeHtml(c.approach)}</p></div>`;
     const pseudo = `<div class="pseint-block"><h4>📜 Algoritmo PSeInt</h4>
       <div class="pseint-inputs"><span class="pseint-inputs-label">Datos de entrada:</span>${formatInputs(c.inputs)}</div>
       <pre class="pseint-code"><code>${escapeHtml(c.pseudocode)}</code></pre></div>`;
-    $('#logic-description').innerHTML = `<div class="description-content">${scenario}${problem}${approach}${pseudo}${learn}
+    $('#logic-description').innerHTML = `<div class="description-content">${scenario}${brief}${problem}${approach}${pseudo}${learn}
       <p class="read-tip">💡 Traduce el pseudocódigo a Python en el editor. Haz una prueba de escritorio en papel si quieres, luego <strong>ejecuta los tests</strong>.</p></div>`;
     Glossary.applyTo($('#logic-description'));
 
@@ -917,8 +918,8 @@
 
     const scenario = item.scenario ? `<div class="scenario-banner">${escapeHtml(item.scenario)}</div>` : '';
     const learn = item.learn ? `<div class="learn-block learn-block-full">${LearnContent.renderHtml(item.learn)}</div>` : '';
-    $('#reading-context').innerHTML = `<div class="description-content">${scenario}${learn}
-      <p class="read-tip">💡 <strong>No ejecutes el código.</strong> Léelo y predice el resultado.</p></div>`;
+    const brief = item.description || '';
+    $('#reading-context').innerHTML = `<div class="description-content">${scenario}${brief}${learn}</div>`;
     Glossary.applyTo($('#reading-context'));
 
     $('#reading-code-title').textContent = 'Código a analizar';

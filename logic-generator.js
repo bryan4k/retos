@@ -63,6 +63,11 @@ const LogicGenerator = (function () {
   function enrichChallenge(ch) {
     const lastOut = [...(ch.traceTable || [])].reverse().find((r) => r.salida != null && r.salida !== '—');
     ch.expectedOutput = lastOut ? String(lastOut.salida) : '';
+    const brief = typeof ExerciseBriefs !== 'undefined' ? ExerciseBriefs.logic(ch) : null;
+    if (brief) {
+      ch.description = brief.description;
+      if (brief.scenario) ch.scenario = brief.scenario;
+    }
     ch.starterCode = buildStarterCode(ch.inputs, ch.pseudocode);
     ch.tech = 'logica';
     ch.type = 'desk-test';

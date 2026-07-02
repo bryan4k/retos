@@ -20,7 +20,7 @@ const ReadingGenerator = (function () {
   };
 
   function q(id, tech, level, title, scenario, code, question, options, correct, explanation, wrong) {
-    return {
+    const item = {
       id, tech, level, type: 'reading', title, scenario, code, question, options,
       correctIndex: correct,
       learn: { concept: learnRead[level], whenToUse: 'En code reviews, debugging, onboarding y mantenimiento de legacy.' },
@@ -31,6 +31,10 @@ const ReadingGenerator = (function () {
       },
       wrongExplanations: wrong || {}
     };
+    if (typeof ExerciseBriefs !== 'undefined') {
+      item.description = ExerciseBriefs.reading(item);
+    }
+    return item;
   }
 
   function jsReading(level, i) {
