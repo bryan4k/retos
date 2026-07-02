@@ -172,12 +172,12 @@
     $('#hint-modal').hidden = false;
   }
 
-  function showSolutionModal(solution, tech) {
+  function showSolutionModal(solution, tech, mode) {
     if (!solution) return;
     if (!confirm('¿Ver la solución completa? Intenta primero con la pista si aún no lo has hecho.')) return;
-    const isCode = /[{};<>]|def |function |return /.test(solution);
+    const isCode = mode !== 'reading' || /def |function |print\(|<[a-z]/.test(solution);
     $('#solution-content').innerHTML = isCode
-      ? `<pre class="solution-code"><code>${escapeHtml(solution)}</code></pre>`
+      ? `<p class="solution-label">Copia este código en el editor:</p><pre class="solution-code"><code>${escapeHtml(solution)}</code></pre>`
       : `<div class="hint-body">${escapeHtml(solution)}</div>`;
     Glossary.applyTo($('#solution-content'));
     $('#solution-modal').hidden = false;
@@ -1031,7 +1031,7 @@
       if (practice.current?.hint) showHintModal(practice.current.hint);
     });
     $('#practice-btn-solution').addEventListener('click', () => {
-      if (practice.current?.solution) showSolutionModal(practice.current.solution, practice.current.tech);
+      if (practice.current?.solution) showSolutionModal(practice.current.solution, practice.current.tech, 'practice');
     });
     $('#practice-btn-learn').addEventListener('click', () => {
       const l = practice.current?.learn;
@@ -1053,7 +1053,7 @@
       if (logic.current?.hint) showHintModal(logic.current.hint);
     });
     $('#logic-btn-solution').addEventListener('click', () => {
-      if (logic.current?.solution) showSolutionModal(logic.current.solution, 'python');
+      if (logic.current?.solution) showSolutionModal(logic.current.solution, 'python', 'logic');
     });
     $('#logic-btn-learn').addEventListener('click', () => {
       const l = logic.current?.learn;
@@ -1069,7 +1069,7 @@
       if (reading.current?.hint) showHintModal(reading.current.hint);
     });
     $('#reading-btn-solution').addEventListener('click', () => {
-      if (reading.current?.solution) showSolutionModal(reading.current.solution, reading.current.tech);
+      if (reading.current?.solution) showSolutionModal(reading.current.solution, reading.current.tech, 'reading');
     });
     $('#reading-btn-guide').addEventListener('click', () => {
       Glossary.applyTo($('#read-guide-modal .modal-body'));

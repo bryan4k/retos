@@ -1003,6 +1003,12 @@ body {
   font-size: 0.875rem;
 }
 
+.solution-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
 .solution-code {
   margin: 0;
   padding: 1rem;
