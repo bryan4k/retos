@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 
@@ -28,7 +28,7 @@
         <h1>CodeRetos</h1>
         <p class="home-subtitle">Practica desarrollo web con escenarios del mundo real</p>
         <p class="home-stats" id="home-stats">800 retos · 800 lecturas · 200 lógica</p>
-        <p class="home-version" id="home-version">v2 · cuenta requerida</p>
+        <p class="home-version" id="home-version">v3 · cuenta requerida</p>
       </div>
 
       <section class="auth-panel" id="auth-panel">
@@ -138,6 +138,9 @@
         <p class="selection-hint" id="practice-plan-summary">4 niveles activos</p>
         <div class="filter-section"><span class="filter-label">Filtrar tecnología</span><div class="tech-filters" id="practice-tech-filters"></div></div>
         <div class="filter-section"><span class="filter-label">Filtrar nivel</span><div class="level-filters" id="practice-level-filters"></div></div>
+        <div class="filter-section sidebar-list-options">
+          <button type="button" class="filter-chip active" id="practice-toggle-completed">Ocultar completados</button>
+        </div>
         <nav class="challenge-list" id="practice-challenge-list"></nav>
       </aside>
       <main class="workspace">
@@ -222,6 +225,9 @@
         </div>
         <p class="selection-hint" id="logic-plan-summary">4 niveles activos</p>
         <div class="filter-section"><span class="filter-label">Filtrar nivel</span><div class="level-filters" id="logic-level-filters"></div></div>
+        <div class="filter-section sidebar-list-options">
+          <button type="button" class="filter-chip active" id="logic-toggle-completed">Ocultar completados</button>
+        </div>
         <nav class="challenge-list" id="logic-challenge-list"></nav>
       </aside>
       <main class="workspace">
@@ -303,6 +309,9 @@
         <p class="selection-hint" id="reading-plan-summary">4 niveles activos</p>
         <div class="filter-section"><span class="filter-label">Filtrar tecnología</span><div class="tech-filters" id="reading-tech-filters"></div></div>
         <div class="filter-section"><span class="filter-label">Filtrar nivel</span><div class="level-filters" id="reading-level-filters"></div></div>
+        <div class="filter-section sidebar-list-options">
+          <button type="button" class="filter-chip active" id="reading-toggle-completed">Ocultar completados</button>
+        </div>
         <nav class="challenge-list" id="reading-challenge-list"></nav>
       </aside>
       <main class="workspace">
@@ -398,6 +407,6 @@
   <script src="auth.js?v=2"></script>
   <script src="runners.js?v=2"></script>
   <script src="logic-runner.js?v=2"></script>
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

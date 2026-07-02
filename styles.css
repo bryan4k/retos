@@ -1409,6 +1409,32 @@ body {
   color: var(--text-muted);
 }
 
+.empty-sidebar-done {
+  padding: 2rem 1rem;
+}
+
+.empty-sidebar-icon {
+  display: block;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-sidebar-done p {
+  margin-bottom: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.sidebar-list-options {
+  padding-bottom: 0.25rem;
+}
+
+.sidebar-list-options .filter-chip {
+  width: 100%;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+}
+
 .btn-link {
   background: none;
   border: none;

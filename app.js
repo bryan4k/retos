@@ -10,6 +10,7 @@
   const READING_LEVELS_PLAN_KEY = 'coderetos-reading-levels-plan';
   const LOGIC_LEVELS_PLAN_KEY = 'coderetos-logic-levels-plan';
   const SIDEBAR_STATE_KEY = 'coderetos-sidebar-state';
+  const HIDE_COMPLETED_KEY = 'coderetos-hide-completed';
   const ATTEMPTS_KEY = 'coderetos-attempts';
   const LIST_LIMIT = 40;
 
@@ -28,9 +29,9 @@
   let logicLevels = defaultLevelsPlan();
   const sidebarCollapsed = { 'practice-sidebar': false, 'reading-sidebar': false, 'logic-sidebar': false };
 
-  const practice = { current: null, level: 'all', tech: 'all', search: '', levelsPlan: practiceLevels };
-  const reading = { current: null, selected: null, level: 'all', tech: 'all', search: '', levelsPlan: readingLevels };
-  const logic = { current: null, level: 'all', tech: 'logica', search: '', levelsPlan: logicLevels };
+  const practice = { current: null, level: 'all', tech: 'all', search: '', levelsPlan: practiceLevels, hideCompleted: true };
+  const reading = { current: null, selected: null, level: 'all', tech: 'all', search: '', levelsPlan: readingLevels, hideCompleted: true };
+  const logic = { current: null, level: 'all', tech: 'logica', search: '', levelsPlan: logicLevels, hideCompleted: true };
 
   const $ = (sel) => document.querySelector(sel);
 
@@ -59,7 +60,12 @@
     practice.levelsPlan = practiceLevels;
     reading.levelsPlan = readingLevels;
     logic.levelsPlan = logicLevels;
+    const hideDone = loadHideCompleted();
+    practice.hideCompleted = hideDone;
+    reading.hideCompleted = hideDone;
+    logic.hideCompleted = hideDone;
     loadSidebarState();
+    updateHideCompletedToggles();
     updateAuthUI();
     updateHomeStats();
     if (activeApp === 'practice') { renderPracticeList(); updatePracticeStats(); }
@@ -93,6 +99,59 @@
     if (app === 'practice') { renderPracticeList(); updatePracticeStats(); }
     else if (app === 'logic') { renderLogicList(); updateLogicStats(); }
     else { renderReadingList(); updateReadingStats(); }
+  }
+
+  function loadHideCompleted() {
+    const v = localStorage.getItem(sk(HIDE_COMPLETED_KEY));
+    if (v === null) return true;
+    return v !== 'false';
+  }
+
+  function saveHideCompleted(value) {
+    localStorage.setItem(sk(HIDE_COMPLETED_KEY), value ? 'true' : 'false');
+  }
+
+  function isHidingCompleted(state) {
+    return state.hideCompleted !== false;
+  }
+
+  function shouldShowInList(c, prog, currentId, state) {
+    if (!isHidingCompleted(state)) return true;
+    return !prog[c.id] || c.id === currentId;
+  }
+
+  function updateHideCompletedToggles() {
+    ['practice', 'reading', 'logic'].forEach((app) => {
+      const btn = $(`#${app}-toggle-completed`);
+      const state = getAppState(app);
+      if (!btn) return;
+      const hiding = isHidingCompleted(state);
+      btn.classList.toggle('active', hiding);
+      btn.textContent = hiding ? 'Ocultar completados' : 'Mostrar completados';
+    });
+  }
+
+  function toggleHideCompleted(app) {
+    const state = getAppState(app);
+    state.hideCompleted = !isHidingCompleted(state);
+    practice.hideCompleted = state.hideCompleted;
+    reading.hideCompleted = state.hideCompleted;
+    logic.hideCompleted = state.hideCompleted;
+    saveHideCompleted(state.hideCompleted);
+    updateHideCompletedToggles();
+    refreshAppLists(app);
+  }
+
+  function advanceToNextChallenge(app) {
+    const state = getAppState(app);
+    if (!isHidingCompleted(state)) return;
+    const pool = getAppPool(app);
+    const prog = app === 'practice' ? progress : app === 'logic' ? logicProgress : readingProgress;
+    const next = UnlockManager.firstUnlocked(app, pool, state.levelsPlan, prog);
+    if (!next) return;
+    if (app === 'practice') selectPractice(next.id);
+    else if (app === 'logic') selectLogic(next.id);
+    else selectReading(next.id);
   }
 
   function saveLevelsPlan(app) {
@@ -523,6 +582,8 @@
 
   function renderList(app, pool, prog, state, listId) {
     const visible = getVisible(pool, state);
+    const currentId = state.current?.id;
+    const listItems = visible.filter((c) => shouldShowInList(c, prog, currentId, state));
 
     if (!visible.length) {
       $(listId).innerHTML = `<div class="empty-sidebar">Sin retos. <button class="btn-link" data-reset="${app}">Activar más niveles</button></div>`;
@@ -536,6 +597,18 @@
       return;
     }
 
+    if (!listItems.length) {
+      const doneCount = visible.filter((c) => prog[c.id]).length;
+      const label = app === 'logic' ? 'ejercicios' : 'retos';
+      $(listId).innerHTML = `<div class="empty-sidebar empty-sidebar-done">
+        <span class="empty-sidebar-icon">🎉</span>
+        <p>¡Completaste ${doneCount} ${label} en esta vista!</p>
+        <button type="button" class="btn-link" data-show-completed="${app}">Ver completados</button>
+      </div>`;
+      $(`[data-show-completed="${app}"]`)?.addEventListener('click', () => toggleHideCompleted(app));
+      return;
+    }
+
     const techEntries = app === 'logic'
       ? [['logica', TECHNOLOGIES.logica]]
       : Object.entries(TECHNOLOGIES).filter(([, t]) => !t.deskTest);
@@ -544,13 +617,22 @@
       const levels = Object.entries(LEVELS).sort((a, b) => a[1].order - b[1].order)
         .filter(([levelId]) => state.levelsPlan[levelId] !== false)
         .map(([levelId, level]) => {
-          const items = visible.filter((c) => c.tech === techId && c.level === levelId);
+          const items = listItems.filter((c) => c.tech === techId && c.level === levelId);
           return items.length ? { levelId, level, items } : null;
         }).filter(Boolean);
       return levels.length ? { techId, tech, levels } : null;
     }).filter(Boolean);
 
-    const currentId = state.current?.id;
+    if (!grouped.length) {
+      $(listId).innerHTML = `<div class="empty-sidebar empty-sidebar-done">
+        <span class="empty-sidebar-icon">🎉</span>
+        <p>¡Todo completado en los filtros actuales!</p>
+        <button type="button" class="btn-link" data-show-completed="${app}">Ver completados</button>
+      </div>`;
+      $(`[data-show-completed="${app}"]`)?.addEventListener('click', () => toggleHideCompleted(app));
+      return;
+    }
+
     $(listId).innerHTML = grouped.map((g) => `
       <div class="tech-group"><div class="tech-group-title">${g.tech.icon} ${g.tech.label}</div>
       ${g.levels.map((lg) => {
@@ -681,6 +763,7 @@
         updateLogicStats();
         renderLogicList();
         showToast('¡Ejercicio completado! 🎉', 'success');
+        advanceToNextChallenge('logic');
       } else {
         recordAttempt(c.id);
       }
@@ -788,6 +871,7 @@
         persistJSON(PROGRESS_KEY, progress);
         updatePracticeStats(); renderPracticeList();
         showToast('¡Reto completado! 🎉', 'success');
+        advanceToNextChallenge('practice');
       } else {
         recordAttempt(c.id);
       }
@@ -868,6 +952,7 @@
       readingProgress[item.id] = true;
       persistJSON(READING_PROGRESS_KEY, readingProgress);
       updateReadingStats(); renderReadingList();
+      advanceToNextChallenge('reading');
     } else {
       recordAttempt(item.id);
     }
@@ -924,6 +1009,10 @@
     $('#practice-back').addEventListener('click', goHome);
     $('#reading-back').addEventListener('click', goHome);
     $('#logic-back').addEventListener('click', goHome);
+
+    $('#practice-toggle-completed')?.addEventListener('click', () => toggleHideCompleted('practice'));
+    $('#reading-toggle-completed')?.addEventListener('click', () => toggleHideCompleted('reading'));
+    $('#logic-toggle-completed')?.addEventListener('click', () => toggleHideCompleted('logic'));
 
     $('#practice-search').addEventListener('input', (e) => { practice.search = e.target.value; renderPracticeList(); });
     $('#reading-search').addEventListener('input', (e) => { reading.search = e.target.value; renderReadingList(); });
