@@ -565,7 +565,7 @@ const ExerciseBriefs = (function () {
       problem: `En ${ctx} al eliminar o confirmar un pago debería aparecer un diálogo modal nativo pero no está en el markup.`,
       objective: `Implementar ${fmt('<dialog>')} con mensaje y botón de cierre o confirmación.`,
       requirements: [
-        `${fmt('<dialog>')} con contenido visible o atributo open.',
+        `${fmt('<dialog>')} con contenido visible o atributo open.`,
         'Texto que explique la acción.',
         'Botón para cerrar o confirmar.'
       ],
@@ -591,7 +591,7 @@ const ExerciseBriefs = (function () {
       problem: `El web component de ${ctx} no permite insertar contenido externo en un punto definido del layout.`,
       objective: `Incluir ${fmt('<slot>')} (o slot con name) donde debe ir el contenido proyectado.`,
       requirements: [
-        `${fmt('<slot>')} dentro de un contenedor.',
+        `${fmt('<slot>')} dentro de un contenedor.`,
         'Opcional: slot name="footer" para zonas nombradas.',
         'Puede ir en template de componente.'
       ],
