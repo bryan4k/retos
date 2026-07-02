@@ -9,20 +9,24 @@
   const LEVELS_PLAN_KEY = 'coderetos-levels-plan';
   const READING_LEVELS_PLAN_KEY = 'coderetos-reading-levels-plan';
   const LOGIC_LEVELS_PLAN_KEY = 'coderetos-logic-levels-plan';
+  const SIDEBAR_STATE_KEY = 'coderetos-sidebar-state';
+  const ATTEMPTS_KEY = 'coderetos-attempts';
   const LIST_LIMIT = 40;
 
   let editor = null;
   let logicEditor = null;
   let activeApp = null;
 
-  const progress = loadJSON(PROGRESS_KEY, {});
-  const readingProgress = loadJSON(READING_PROGRESS_KEY, {});
-  const logicProgress = loadJSON(LOGIC_PROGRESS_KEY, {});
-  const savedCode = loadJSON(CODE_KEY, {});
-  const savedLogicCode = loadJSON(LOGIC_CODE_KEY, {});
-  const practiceLevels = loadLevelsPlan(LEVELS_PLAN_KEY);
-  const readingLevels = loadLevelsPlan(READING_LEVELS_PLAN_KEY);
-  const logicLevels = loadLevelsPlan(LOGIC_LEVELS_PLAN_KEY);
+  let progress = {};
+  let readingProgress = {};
+  let logicProgress = {};
+  let savedCode = {};
+  let savedLogicCode = {};
+  let attempts = {};
+  let practiceLevels = defaultLevelsPlan();
+  let readingLevels = defaultLevelsPlan();
+  let logicLevels = defaultLevelsPlan();
+  const sidebarCollapsed = { 'practice-sidebar': false, 'reading-sidebar': false, 'logic-sidebar': false };
 
   const practice = { current: null, level: 'all', tech: 'all', search: '', levelsPlan: practiceLevels };
   const reading = { current: null, selected: null, level: 'all', tech: 'all', search: '', levelsPlan: readingLevels };
@@ -34,12 +38,41 @@
     try { return JSON.parse(localStorage.getItem(key)) || fb; } catch { return fb; }
   }
 
+  function sk(key) {
+    return Auth.userKey(key);
+  }
+
+  function persistJSON(key, data) {
+    localStorage.setItem(sk(key), JSON.stringify(data));
+  }
+
+  function reloadUserData() {
+    progress = loadJSON(sk(PROGRESS_KEY), {});
+    readingProgress = loadJSON(sk(READING_PROGRESS_KEY), {});
+    logicProgress = loadJSON(sk(LOGIC_PROGRESS_KEY), {});
+    savedCode = loadJSON(sk(CODE_KEY), {});
+    savedLogicCode = loadJSON(sk(LOGIC_CODE_KEY), {});
+    attempts = loadJSON(sk(ATTEMPTS_KEY), {});
+    practiceLevels = loadLevelsPlan(LEVELS_PLAN_KEY);
+    readingLevels = loadLevelsPlan(READING_LEVELS_PLAN_KEY);
+    logicLevels = loadLevelsPlan(LOGIC_LEVELS_PLAN_KEY);
+    practice.levelsPlan = practiceLevels;
+    reading.levelsPlan = readingLevels;
+    logic.levelsPlan = logicLevels;
+    loadSidebarState();
+    updateAuthUI();
+    updateHomeStats();
+    if (activeApp === 'practice') { renderPracticeList(); updatePracticeStats(); }
+    else if (activeApp === 'reading') { renderReadingList(); updateReadingStats(); }
+    else if (activeApp === 'logic') { renderLogicList(); updateLogicStats(); }
+  }
+
   function defaultLevelsPlan() {
     return { principiante: true, intermedio: true, avanzado: true, experto: true };
   }
 
   function loadLevelsPlan(key) {
-    const stored = loadJSON(key, null);
+    const stored = loadJSON(sk(key), null);
     if (stored && typeof stored === 'object') return { ...defaultLevelsPlan(), ...stored };
     return defaultLevelsPlan();
   }
@@ -65,7 +98,140 @@
   function saveLevelsPlan(app) {
     const key = app === 'practice' ? LEVELS_PLAN_KEY
       : app === 'logic' ? LOGIC_LEVELS_PLAN_KEY : READING_LEVELS_PLAN_KEY;
-    localStorage.setItem(key, JSON.stringify(getAppState(app).levelsPlan));
+    persistJSON(key, getAppState(app).levelsPlan);
+  }
+
+  function recordAttempt(id) {
+    attempts[id] = (attempts[id] || 0) + 1;
+    persistJSON(ATTEMPTS_KEY, attempts);
+  }
+
+  function showHintModal(text) {
+    if (!text) return;
+    $('#hint-content').textContent = text;
+    Glossary.applyTo($('#hint-content'));
+    $('#hint-modal').hidden = false;
+  }
+
+  function showSolutionModal(solution, tech) {
+    if (!solution) return;
+    if (!confirm('¿Ver la solución completa? Intenta primero con la pista si aún no lo has hecho.')) return;
+    const isCode = /[{};<>]|def |function |return /.test(solution);
+    $('#solution-content').innerHTML = isCode
+      ? `<pre class="solution-code"><code>${escapeHtml(solution)}</code></pre>`
+      : `<div class="hint-body">${escapeHtml(solution)}</div>`;
+    Glossary.applyTo($('#solution-content'));
+    $('#solution-modal').hidden = false;
+  }
+
+  function loadSidebarState() {
+    const stored = loadJSON(sk(SIDEBAR_STATE_KEY), {});
+    Object.keys(sidebarCollapsed).forEach((id) => {
+      sidebarCollapsed[id] = !!stored[id];
+      applySidebarCollapse(id, sidebarCollapsed[id]);
+    });
+  }
+
+  function saveSidebarState() {
+    persistJSON(SIDEBAR_STATE_KEY, { ...sidebarCollapsed });
+  }
+
+  function applySidebarCollapse(id, collapsed) {
+    const el = $(`#${id}`);
+    if (!el) return;
+    el.classList.toggle('collapsed', collapsed);
+    const btn = el.querySelector('.sidebar-collapse');
+    if (btn) btn.textContent = collapsed ? '▶' : '◀';
+    const layout = el.closest('.layout');
+    if (layout) layout.classList.toggle('sidebar-is-collapsed', collapsed);
+  }
+
+  function toggleSidebarCollapse(id) {
+    sidebarCollapsed[id] = !sidebarCollapsed[id];
+    applySidebarCollapse(id, sidebarCollapsed[id]);
+    saveSidebarState();
+    refreshEditor();
+    refreshLogicEditor();
+  }
+
+  function requireAuth() {
+    if (Auth.isLoggedIn()) return true;
+    showToast('Debes iniciar sesión o crear una cuenta para acceder a los retos', 'info');
+    $('#auth-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('#auth-username')?.focus();
+    return false;
+  }
+
+  function updateAuthUI() {
+    const logged = Auth.isLoggedIn();
+    const bar = $('#auth-user-bar');
+    const form = $('#auth-form');
+    if (!bar || !form) return;
+    if (logged) {
+      bar.hidden = false;
+      form.hidden = true;
+      $('#auth-username-display').textContent = Auth.getUsername();
+      $('#auth-avatar').textContent = Auth.getUsername().charAt(0).toUpperCase();
+    } else {
+      bar.hidden = true;
+      form.hidden = false;
+    }
+
+    document.querySelector('.home-cards')?.classList.toggle('home-cards-locked', !logged);
+    ['enter-practice', 'enter-reading', 'enter-logic'].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.disabled = !logged;
+    });
+
+    ['practice', 'reading', 'logic'].forEach((app) => {
+      const el = $(`#${app}-session`);
+      const userEl = $(`#${app}-session-user`);
+      if (!el || !userEl) return;
+      if (logged) {
+        el.hidden = false;
+        userEl.textContent = Auth.getUsername();
+      } else {
+        el.hidden = true;
+      }
+    });
+  }
+
+  function handleLogout() {
+    Auth.logout();
+    reloadUserData();
+    goHome();
+    showToast('Sesión cerrada', 'info');
+  }
+
+  async function handleAuthSubmit(e) {
+    e.preventDefault();
+    const username = $('#auth-username').value;
+    const password = $('#auth-password').value;
+    const errEl = $('#auth-error');
+    const result = await Auth.login(username, password);
+    if (!result.ok) {
+      errEl.textContent = result.error;
+      errEl.hidden = false;
+      return;
+    }
+    errEl.hidden = true;
+    reloadUserData();
+    showToast(`Bienvenido, ${result.username}`, 'success');
+  }
+
+  async function handleAuthRegister() {
+    const username = $('#auth-username').value;
+    const password = $('#auth-password').value;
+    const errEl = $('#auth-error');
+    const result = await Auth.register(username, password);
+    if (!result.ok) {
+      errEl.textContent = result.error;
+      errEl.hidden = false;
+      return;
+    }
+    errEl.hidden = true;
+    reloadUserData();
+    showToast(`Cuenta creada. ¡Hola, ${result.username}!`, 'success');
   }
 
   function isInPlan(c, levelsPlan) {
@@ -134,6 +300,7 @@
   }
 
   function enterPractice() {
+    if (!requireAuth()) return;
     activeApp = 'practice';
     $('#screen-home').hidden = true;
     $('#app-practice').hidden = false;
@@ -145,13 +312,14 @@
     renderPracticeList();
     updatePracticeStats();
     if (!practice.current) {
-      const first = getPlanPool(CHALLENGES, practice.levelsPlan).find((c) => !progress[c.id]);
+      const first = UnlockManager.firstUnlocked('practice', CHALLENGES, practice.levelsPlan, progress);
       if (first) selectPractice(first.id);
     }
     refreshEditor();
   }
 
   function enterReading() {
+    if (!requireAuth()) return;
     activeApp = 'reading';
     $('#screen-home').hidden = true;
     $('#app-practice').hidden = true;
@@ -166,12 +334,12 @@
     renderFilters('reading', reading, READING_CHALLENGES);
     renderReadingList();
     updateReadingStats();
-    const pool = getPlanPool(READING_CHALLENGES, reading.levelsPlan);
-    const pick = pool.find((c) => !readingProgress[c.id]) || pool[0];
+    const pick = UnlockManager.firstUnlocked('reading', READING_CHALLENGES, reading.levelsPlan, readingProgress);
     if (pick) selectReading(pick.id);
   }
 
   function enterLogic() {
+    if (!requireAuth()) return;
     activeApp = 'logic';
     $('#screen-home').hidden = true;
     $('#app-practice').hidden = true;
@@ -185,8 +353,7 @@
     renderLogicList();
     updateLogicStats();
     Runners.loadPyodide().catch(() => {});
-    const pool = getPlanPool(LOGIC_CHALLENGES, logic.levelsPlan);
-    const pick = pool.find((c) => !logicProgress[c.id]) || pool[0];
+    const pick = UnlockManager.firstUnlocked('logic', LOGIC_CHALLENGES, logic.levelsPlan, logicProgress);
     if (pick) selectLogic(pick.id);
     refreshLogicEditor();
   }
@@ -210,7 +377,7 @@
     editor.on('change', () => {
       if (practice.current) {
         savedCode[practice.current.id] = editor.getValue();
-        localStorage.setItem(CODE_KEY, JSON.stringify(savedCode));
+        persistJSON(CODE_KEY, savedCode);
         if (Runners.needsPreview(practice.current.tech)) updatePracticePreview();
       }
     });
@@ -233,7 +400,7 @@
     logicEditor.on('change', () => {
       if (logic.current) {
         savedLogicCode[logic.current.id] = logicEditor.getValue();
-        localStorage.setItem(LOGIC_CODE_KEY, JSON.stringify(savedLogicCode));
+        persistJSON(LOGIC_CODE_KEY, savedLogicCode);
       }
     });
   }
@@ -271,7 +438,7 @@
       if (cur && !isInPlan(cur, state.levelsPlan)) {
         const pool = getAppPool(app);
         const prog = app === 'practice' ? progress : app === 'logic' ? logicProgress : readingProgress;
-        const first = getPlanPool(pool, state.levelsPlan).find((c) => !prog[c.id]);
+        const first = UnlockManager.firstUnlocked(app, pool, state.levelsPlan, prog);
         getAppState(app).current = null;
         if (first) {
           if (app === 'practice') selectPractice(first.id);
@@ -389,15 +556,17 @@
       ${g.levels.map((lg) => {
         const shown = lg.items.slice(0, LIST_LIMIT);
         const more = lg.items.length - shown.length;
+        const doneInGroup = lg.items.filter((c) => prog[c.id]).length;
         return `<div class="level-group">
           <div class="level-group-title"><span class="level-dot" style="background:${lg.level.color}"></span>
-            ${lg.level.label} <span class="count-badge">${lg.items.length}</span></div>
-          ${shown.map((c) => renderRow(c, prog, currentId)).join('')}
+            ${lg.level.label} <span class="count-badge">${lg.items.length}</span>
+            <span class="group-progress">${doneInGroup}/${lg.items.length}</span></div>
+          ${shown.map((c) => renderRow(c, prog, currentId, app)).join('')}
           ${more > 0 ? `<p class="more-hint">+${more} más — usa búsqueda</p>` : ''}
         </div>`;
       }).join('')}</div>`).join('');
 
-    $(listId).querySelectorAll('.challenge-item').forEach((btn) => {
+    $(listId).querySelectorAll('.challenge-item:not([disabled])').forEach((btn) => {
       btn.onclick = () => {
         if (app === 'practice') selectPractice(btn.dataset.id);
         else if (app === 'logic') selectLogic(btn.dataset.id);
@@ -406,12 +575,15 @@
     });
   }
 
-  function renderRow(c, prog, currentId) {
+  function renderRow(c, prog, currentId, app) {
     const done = prog[c.id];
     const active = currentId === c.id;
-    return `<div class="challenge-row${active ? ' active' : ''}${done ? ' completed' : ''}">
-      <button class="challenge-item full-width" data-id="${c.id}">
-        <span class="challenge-status">${done ? '✓' : '○'}</span>
+    const unlocked = UnlockManager.isUnlocked(app, c, prog);
+    const locked = !unlocked;
+    const lockTitle = locked ? escapeHtml(UnlockManager.nextLockedReason(app, c, prog) || '') : '';
+    return `<div class="challenge-row${active ? ' active' : ''}${done ? ' completed' : ''}${locked ? ' locked' : ''}">
+      <button class="challenge-item full-width" data-id="${c.id}" ${locked ? 'disabled title="' + lockTitle + '"' : ''}>
+        <span class="challenge-status${locked ? ' locked-icon' : ''}">${done ? '✓' : locked ? '🔒' : '○'}</span>
         <span class="challenge-name">${escapeHtml(c.title)}</span>
       </button></div>`;
   }
@@ -434,6 +606,10 @@
   function selectLogic(id) {
     const c = LOGIC_CHALLENGES.find((x) => x.id === id);
     if (!c || !isInPlan(c, logic.levelsPlan)) return;
+    if (!UnlockManager.isUnlocked('logic', c, logicProgress)) {
+      showToast(UnlockManager.nextLockedReason('logic', c, logicProgress) || 'Completa el ejercicio anterior.', 'info');
+      return;
+    }
     logic.current = c;
 
     $('#logic-level-badge').textContent = LEVELS[c.level].label;
@@ -457,6 +633,7 @@
     $('#logic-btn-run').disabled = false;
     $('#logic-btn-reset').disabled = false;
     $('#logic-btn-hint').disabled = !c.hint;
+    $('#logic-btn-solution').disabled = !c.solution;
     $('#logic-btn-learn').disabled = !c.learn;
     $('#logic-results').innerHTML = '<div class="empty-state small"><p>Escribe tu solución y ejecuta los tests.</p></div>';
     $('#logic-results-summary').textContent = '';
@@ -500,10 +677,12 @@
 
       if (ok) {
         logicProgress[c.id] = true;
-        localStorage.setItem(LOGIC_PROGRESS_KEY, JSON.stringify(logicProgress));
+        persistJSON(LOGIC_PROGRESS_KEY, logicProgress);
         updateLogicStats();
         renderLogicList();
         showToast('¡Ejercicio completado! 🎉', 'success');
+      } else {
+        recordAttempt(c.id);
       }
     } catch (err) {
       $('#logic-results-summary').textContent = 'Error';
@@ -532,6 +711,10 @@
   function selectPractice(id) {
     const c = CHALLENGES.find((x) => x.id === id);
     if (!c || !isInPlan(c, practice.levelsPlan)) return;
+    if (!UnlockManager.isUnlocked('practice', c, progress)) {
+      showToast(UnlockManager.nextLockedReason('practice', c, progress) || 'Completa el reto anterior.', 'info');
+      return;
+    }
     practice.current = c;
 
     $('#practice-tech-badge').textContent = TECHNOLOGIES[c.tech].label;
@@ -558,6 +741,7 @@
     $('#practice-btn-run').disabled = false;
     $('#practice-btn-reset').disabled = false;
     $('#practice-btn-hint').disabled = !c.hint;
+    $('#practice-btn-solution').disabled = !c.solution;
     $('#practice-btn-learn').disabled = !c.learn;
     $('#practice-results').innerHTML = `<div class="empty-state small"><p>Ejecuta los tests.</p></div>`;
     $('#practice-results-summary').textContent = '';
@@ -601,11 +785,14 @@
       Glossary.applyTo($('#practice-results'));
       if (ok) {
         progress[c.id] = true;
-        localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+        persistJSON(PROGRESS_KEY, progress);
         updatePracticeStats(); renderPracticeList();
         showToast('¡Reto completado! 🎉', 'success');
+      } else {
+        recordAttempt(c.id);
       }
     } catch (err) {
+      recordAttempt(c.id);
       $('#practice-results-summary').textContent = 'Error';
       $('#practice-results-summary').className = 'results-summary fail';
       const fb = err.compileFeedback || c.feedback?.general;
@@ -630,6 +817,10 @@
   function selectReading(id) {
     const item = READING_CHALLENGES.find((x) => x.id === id);
     if (!item || !isInPlan(item, reading.levelsPlan)) return;
+    if (!UnlockManager.isUnlocked('reading', item, readingProgress)) {
+      showToast(UnlockManager.nextLockedReason('reading', item, readingProgress) || 'Completa el ejercicio anterior.', 'info');
+      return;
+    }
     reading.current = item;
     reading.selected = null;
 
@@ -661,6 +852,8 @@
     });
 
     $('#reading-btn-check').disabled = false;
+    $('#reading-btn-hint').disabled = !item.hint;
+    $('#reading-btn-solution').disabled = !item.solution;
     $('#reading-explanation').innerHTML = `<div class="empty-state small"><p>Selecciona y verifica.</p></div>`;
     $('#reading-result-summary').textContent = '';
     renderReadingList();
@@ -673,8 +866,10 @@
     const correct = reading.selected === item.correctIndex;
     if (correct) {
       readingProgress[item.id] = true;
-      localStorage.setItem(READING_PROGRESS_KEY, JSON.stringify(readingProgress));
+      persistJSON(READING_PROGRESS_KEY, readingProgress);
       updateReadingStats(); renderReadingList();
+    } else {
+      recordAttempt(item.id);
     }
 
     $('#reading-result-summary').textContent = correct ? '✓ Correcto' : '✗ Incorrecto';
@@ -739,16 +934,15 @@
       if (practice.current?.starterCode && confirm('¿Reiniciar?')) {
         editor.setValue(practice.current.starterCode);
         savedCode[practice.current.id] = practice.current.starterCode;
-        localStorage.setItem(CODE_KEY, JSON.stringify(savedCode));
+        persistJSON(CODE_KEY, savedCode);
         updatePracticePreview();
       }
     });
     $('#practice-btn-hint').addEventListener('click', () => {
-      if (practice.current?.hint) {
-        $('#hint-content').innerHTML = `<p>${escapeHtml(practice.current.hint)}</p>`;
-        Glossary.applyTo($('#hint-content'));
-        $('#hint-modal').hidden = false;
-      }
+      if (practice.current?.hint) showHintModal(practice.current.hint);
+    });
+    $('#practice-btn-solution').addEventListener('click', () => {
+      if (practice.current?.solution) showSolutionModal(practice.current.solution, practice.current.tech);
     });
     $('#practice-btn-learn').addEventListener('click', () => {
       const l = practice.current?.learn;
@@ -763,15 +957,14 @@
     $('#logic-btn-reset').addEventListener('click', () => {
       if (!logic.current?.starterCode || !confirm('¿Reiniciar código?')) return;
       delete savedLogicCode[logic.current.id];
-      localStorage.setItem(LOGIC_CODE_KEY, JSON.stringify(savedLogicCode));
+      persistJSON(LOGIC_CODE_KEY, savedLogicCode);
       selectLogic(logic.current.id);
     });
     $('#logic-btn-hint').addEventListener('click', () => {
-      if (logic.current?.hint) {
-        $('#hint-content').innerHTML = `<p>${escapeHtml(logic.current.hint)}</p>`;
-        Glossary.applyTo($('#hint-content'));
-        $('#hint-modal').hidden = false;
-      }
+      if (logic.current?.hint) showHintModal(logic.current.hint);
+    });
+    $('#logic-btn-solution').addEventListener('click', () => {
+      if (logic.current?.solution) showSolutionModal(logic.current.solution, 'python');
     });
     $('#logic-btn-learn').addEventListener('click', () => {
       const l = logic.current?.learn;
@@ -783,16 +976,44 @@
     });
 
     $('#reading-btn-check').addEventListener('click', checkReadingAnswer);
+    $('#reading-btn-hint').addEventListener('click', () => {
+      if (reading.current?.hint) showHintModal(reading.current.hint);
+    });
+    $('#reading-btn-solution').addEventListener('click', () => {
+      if (reading.current?.solution) showSolutionModal(reading.current.solution, reading.current.tech);
+    });
     $('#reading-btn-guide').addEventListener('click', () => {
       Glossary.applyTo($('#read-guide-modal .modal-body'));
       $('#read-guide-modal').hidden = false;
     });
 
     document.querySelectorAll('.menu-toggle').forEach((btn) => {
-      btn.addEventListener('click', () => $(`#${btn.dataset.sidebar}`)?.classList.add('open'));
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.sidebar;
+        const el = $(`#${id}`);
+        if (el?.classList.contains('collapsed')) toggleSidebarCollapse(id);
+        else el?.classList.add('open');
+      });
+    });
+    document.querySelectorAll('.sidebar-collapse').forEach((btn) => {
+      btn.addEventListener('click', () => toggleSidebarCollapse(btn.dataset.sidebar));
+    });
+    document.querySelectorAll('.sidebar-expand').forEach((btn) => {
+      btn.addEventListener('click', () => toggleSidebarCollapse(btn.dataset.sidebar));
     });
     document.querySelectorAll('.sidebar-close').forEach((btn) => {
       btn.addEventListener('click', () => closeSidebar(btn.dataset.sidebar));
+    });
+
+    $('#auth-form')?.addEventListener('submit', handleAuthSubmit);
+    $('#auth-register')?.addEventListener('click', handleAuthRegister);
+    $('#auth-logout')?.addEventListener('click', handleLogout);
+    document.querySelectorAll('.session-logout').forEach((btn) => {
+      btn.addEventListener('click', handleLogout);
+    });
+    Auth.onAuthChange(() => {
+      updateAuthUI();
+      if (!Auth.isLoggedIn() && activeApp) goHome();
     });
     document.querySelectorAll('[data-close]').forEach((b) => {
       b.addEventListener('click', () => { $(`#${b.dataset.close}`).hidden = true; });
@@ -804,11 +1025,12 @@
   }
 
   function init() {
+    Auth.restoreSession();
+    reloadUserData();
     initEditor();
     initLogicEditor();
     renderFilters('practice', practice, CHALLENGES);
     renderFilters('reading', reading, READING_CHALLENGES);
-    updateHomeStats();
     bindEvents();
     goHome();
   }

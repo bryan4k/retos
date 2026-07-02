@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 
@@ -28,7 +28,34 @@
         <h1>CodeRetos</h1>
         <p class="home-subtitle">Practica desarrollo web con escenarios del mundo real</p>
         <p class="home-stats" id="home-stats">800 retos · 800 lecturas · 200 lógica</p>
+        <p class="home-version" id="home-version">v2 · cuenta requerida</p>
       </div>
+
+      <section class="auth-panel" id="auth-panel">
+        <div class="auth-panel-inner">
+          <div class="auth-user-bar" id="auth-user-bar" hidden>
+            <span class="auth-avatar" id="auth-avatar">👤</span>
+            <div class="auth-user-info">
+              <span class="auth-welcome">Sesión activa</span>
+              <strong id="auth-username-display">usuario</strong>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="auth-logout">Cerrar sesión</button>
+          </div>
+          <form class="auth-form" id="auth-form">
+            <h3 class="auth-title">Inicia sesión para continuar</h3>
+            <p class="auth-subtitle">Debes iniciar sesión o crear una cuenta antes de acceder a los retos. Tu progreso se guarda en este navegador.</p>
+            <div class="auth-fields">
+              <label class="auth-label">Usuario<input type="text" id="auth-username" placeholder="ej. maria_dev" autocomplete="username" required></label>
+              <label class="auth-label">Contraseña<input type="password" id="auth-password" placeholder="Mínimo 4 caracteres" autocomplete="current-password" required></label>
+            </div>
+            <p class="auth-error" id="auth-error" hidden></p>
+            <div class="auth-actions">
+              <button type="submit" class="btn btn-primary" id="auth-login">Iniciar sesión</button>
+              <button type="button" class="btn btn-ghost" id="auth-register">Crear cuenta</button>
+            </div>
+          </form>
+        </div>
+      </section>
 
       <div class="home-cards">
         <button class="home-card home-card-practice" id="enter-practice">
@@ -80,6 +107,10 @@
         </div>
       </div>
       <div class="header-stats">
+        <div class="header-session" id="practice-session" hidden>
+          <span class="session-user" id="practice-session-user"></span>
+          <button type="button" class="btn btn-ghost btn-sm session-logout">Salir</button>
+        </div>
         <div class="stat"><span class="stat-value" id="practice-completed">0</span><span class="stat-label">Completados</span></div>
         <div class="stat"><span class="stat-value" id="practice-total">0</span><span class="stat-label">En tus niveles</span></div>
         <div class="progress-ring">
@@ -90,7 +121,14 @@
     </header>
     <div class="layout">
       <aside class="sidebar" id="practice-sidebar">
-        <div class="sidebar-header"><h2>Retos de código</h2><button class="btn-icon sidebar-close" data-sidebar="practice-sidebar">✕</button></div>
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">Retos de código</h2>
+          <div class="sidebar-header-actions">
+            <button type="button" class="btn-icon sidebar-collapse" data-sidebar="practice-sidebar" title="Minimizar panel" aria-label="Minimizar panel">◀</button>
+            <button type="button" class="btn-icon sidebar-close" data-sidebar="practice-sidebar" aria-label="Cerrar panel">✕</button>
+          </div>
+        </div>
+        <button type="button" class="sidebar-expand" data-sidebar="practice-sidebar" title="Mostrar panel" aria-label="Mostrar panel">☰ Retos</button>
         <div class="search-box"><input type="search" id="practice-search" placeholder="Buscar reto..." autocomplete="off"></div>
         <div class="filter-section">
           <span class="filter-label">Niveles en tu plan</span>
@@ -113,6 +151,7 @@
           <div class="toolbar-actions">
             <button class="btn btn-ghost" id="practice-btn-learn" disabled>Aprende</button>
             <button class="btn btn-ghost" id="practice-btn-hint" disabled>Pista</button>
+            <button class="btn btn-ghost" id="practice-btn-solution" disabled>Ver solución</button>
             <button class="btn btn-ghost" id="practice-btn-reset" disabled>Reiniciar</button>
             <button class="btn btn-primary" id="practice-btn-run" disabled>Ejecutar tests</button>
           </div>
@@ -153,6 +192,10 @@
         </div>
       </div>
       <div class="header-stats">
+        <div class="header-session" id="logic-session" hidden>
+          <span class="session-user" id="logic-session-user"></span>
+          <button type="button" class="btn btn-ghost btn-sm session-logout">Salir</button>
+        </div>
         <div class="stat"><span class="stat-value" id="logic-completed">0</span><span class="stat-label">Completados</span></div>
         <div class="stat"><span class="stat-value" id="logic-total">0</span><span class="stat-label">En tus niveles</span></div>
         <div class="progress-ring">
@@ -163,7 +206,14 @@
     </header>
     <div class="layout">
       <aside class="sidebar" id="logic-sidebar">
-        <div class="sidebar-header"><h2>Ejercicios de lógica</h2><button class="btn-icon sidebar-close" data-sidebar="logic-sidebar">✕</button></div>
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">Ejercicios de lógica</h2>
+          <div class="sidebar-header-actions">
+            <button type="button" class="btn-icon sidebar-collapse" data-sidebar="logic-sidebar" title="Minimizar panel" aria-label="Minimizar panel">◀</button>
+            <button type="button" class="btn-icon sidebar-close" data-sidebar="logic-sidebar" aria-label="Cerrar panel">✕</button>
+          </div>
+        </div>
+        <button type="button" class="sidebar-expand" data-sidebar="logic-sidebar" title="Mostrar panel" aria-label="Mostrar panel">☰ Lógica</button>
         <div class="search-box"><input type="search" id="logic-search" placeholder="Buscar ejercicio..." autocomplete="off"></div>
         <div class="filter-section">
           <span class="filter-label">Niveles en tu plan</span>
@@ -185,6 +235,7 @@
           <div class="toolbar-actions">
             <button class="btn btn-ghost" id="logic-btn-learn" disabled>Aprende</button>
             <button class="btn btn-ghost" id="logic-btn-hint" disabled>Pista</button>
+            <button class="btn btn-ghost" id="logic-btn-solution" disabled>Ver solución</button>
             <button class="btn btn-ghost" id="logic-btn-reset" disabled>Reiniciar</button>
             <button class="btn btn-primary" id="logic-btn-run" disabled>Ejecutar tests</button>
           </div>
@@ -221,6 +272,10 @@
         </div>
       </div>
       <div class="header-stats">
+        <div class="header-session" id="reading-session" hidden>
+          <span class="session-user" id="reading-session-user"></span>
+          <button type="button" class="btn btn-ghost btn-sm session-logout">Salir</button>
+        </div>
         <div class="stat"><span class="stat-value" id="reading-completed">0</span><span class="stat-label">Completados</span></div>
         <div class="stat"><span class="stat-value" id="reading-total">0</span><span class="stat-label">En tus niveles</span></div>
         <div class="progress-ring">
@@ -231,7 +286,14 @@
     </header>
     <div class="layout">
       <aside class="sidebar" id="reading-sidebar">
-        <div class="sidebar-header"><h2>Ejercicios de lectura</h2><button class="btn-icon sidebar-close" data-sidebar="reading-sidebar">✕</button></div>
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">Ejercicios de lectura</h2>
+          <div class="sidebar-header-actions">
+            <button type="button" class="btn-icon sidebar-collapse" data-sidebar="reading-sidebar" title="Minimizar panel" aria-label="Minimizar panel">◀</button>
+            <button type="button" class="btn-icon sidebar-close" data-sidebar="reading-sidebar" aria-label="Cerrar panel">✕</button>
+          </div>
+        </div>
+        <button type="button" class="sidebar-expand" data-sidebar="reading-sidebar" title="Mostrar panel" aria-label="Mostrar panel">☰ Lectura</button>
         <div class="search-box"><input type="search" id="reading-search" placeholder="Buscar ejercicio..." autocomplete="off"></div>
         <div class="filter-section">
           <span class="filter-label">Niveles en tu plan</span>
@@ -253,6 +315,8 @@
           </div>
           <div class="toolbar-actions">
             <button class="btn btn-ghost" id="reading-btn-guide">Guía de lectura</button>
+            <button class="btn btn-ghost" id="reading-btn-hint" disabled>Pista</button>
+            <button class="btn btn-ghost" id="reading-btn-solution" disabled>Ver solución</button>
             <button class="btn btn-primary" id="reading-btn-check" disabled>Verificar respuesta</button>
           </div>
         </div>
@@ -291,7 +355,10 @@
   <div class="toast-container" id="toast-container"></div>
 
   <div class="modal-overlay" id="hint-modal" hidden>
-    <div class="modal"><div class="modal-header"><h3>💡 Pista</h3><button class="btn-icon modal-close" data-close="hint-modal">✕</button></div><div class="modal-body" id="hint-content"></div></div>
+    <div class="modal"><div class="modal-header"><h3>💡 Pista</h3><button class="btn-icon modal-close" data-close="hint-modal">✕</button></div><div class="modal-body hint-body" id="hint-content"></div></div>
+  </div>
+  <div class="modal-overlay" id="solution-modal" hidden>
+    <div class="modal modal-wide"><div class="modal-header"><h3>✅ Solución</h3><button class="btn-icon modal-close" data-close="solution-modal">✕</button></div><div class="modal-body" id="solution-content"></div></div>
   </div>
   <div class="modal-overlay" id="learn-modal" hidden>
     <div class="modal"><div class="modal-header"><h3>📚 Aprende</h3><button class="btn-icon modal-close" data-close="learn-modal">✕</button></div><div class="modal-body" id="learn-content"></div></div>
@@ -325,9 +392,12 @@
   <script src="challenge-generator.js"></script>
   <script src="reading-generator.js"></script>
   <script src="logic-generator.js"></script>
-  <script src="challenges.js"></script>
-  <script src="runners.js"></script>
-  <script src="logic-runner.js"></script>
-  <script src="app.js"></script>
+  <script src="challenge-enrich.js?v=2"></script>
+  <script src="unlock.js?v=2"></script>
+  <script src="challenges.js?v=2"></script>
+  <script src="auth.js?v=2"></script>
+  <script src="runners.js?v=2"></script>
+  <script src="logic-runner.js?v=2"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

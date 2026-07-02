@@ -68,7 +68,7 @@ const LogicGenerator = (function () {
     ch.type = 'desk-test';
     ch.code = ch.pseudocode;
     ch.tests = [{ name: 'Salida del programa', type: 'stdout', expected: ch.expectedOutput }];
-    ch.hint = ch.approach;
+    ch.hint = '';
     ch.feedback = {
       general: {
         why: ch.explanation?.why || 'La salida de tu programa no coincide con lo esperado.',
