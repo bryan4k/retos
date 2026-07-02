@@ -417,6 +417,22 @@ const ChallengeEnrich = (function () {
 
   function buildPracticeHint(c) {
     const parts = [];
+
+    if (c.tech === 'html' && typeof ExerciseBriefs !== 'undefined' && ExerciseBriefs.getHtmlBrief && c.htmlTag) {
+      const b = ExerciseBriefs.getHtmlBrief(c.htmlTag, c.ctx || 'la aplicación');
+      if (b.scenario) parts.push(b.scenario.replace(/^[^\s]+\s/, ''));
+      parts.push(`Problema: ${stripHtml(b.problem)}`);
+      parts.push(`Objetivo: ${stripHtml(b.objective)}`);
+      if (b.requirements?.length) {
+        parts.push('Requisitos:\n' + b.requirements.map((r) => `• ${stripHtml(r)}`).join('\n'));
+      }
+      if (b.example) parts.push(`Ejemplo: ${stripHtml(b.example)}`);
+      if (b.deliverable) parts.push(`Éxito: ${stripHtml(b.deliverable)}`);
+      if (c.tests?.length) parts.push(`Tests: ${c.tests.map((t) => t.name).join(', ')}.`);
+      if (c.feedback?.general?.whenToUse) parts.push(`Cuándo usarlo: ${c.feedback.general.whenToUse}`);
+      return parts.join('\n\n');
+    }
+
     if (c.scenario) parts.push(`Contexto: ${c.scenario.replace(/^[^\s]+\s/, '')}`);
     parts.push(`Objetivo: ${stripHtml(c.description || c.title)}`);
 
@@ -427,9 +443,8 @@ const ChallengeEnrich = (function () {
       if (test?.feedback?.fix) parts.push(`Enfoque: ${test.feedback.fix}`);
       parts.push(`Empieza completando ${c.tech === 'python' ? `def ${fn}()` : `function ${fn}()`} y valida con un caso simple antes de ejecutar todos los tests.`);
     } else if (c.tech === 'html') {
-      const tag = (c.title.match(/<(\w+)>/) || [])[1] || 'el elemento pedido';
-      parts.push(`Debes incluir <${tag}> con los atributos que pide el test (revisa alt, href, etc.).`);
       if (c.tests?.length) parts.push(`Tests clave: ${c.tests.map((t) => t.name).join(', ')}.`);
+      parts.push('Lee el bloque Problema y Objetivo del enunciado; cada requisito indica qué etiqueta y atributos necesitas.');
     } else if (c.tech === 'css') {
       const prop = (c.title.match(/Estilo (\S+)/) || [])[1] || 'la propiedad indicada';
       parts.push(`Aplica ${prop} al selector correcto del scaffold HTML.`);

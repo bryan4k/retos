@@ -249,13 +249,15 @@ const ChallengeGenerator = (function () {
 
       list.push({
         id, tech: 'html', level,
-        title: `Usar <${tag}> en ${ctx.split(' ').slice(-2).join(' ')} #${i + 1}`,
+        title: `${brief.title} — ${ctx}`,
+        htmlTag: tag,
+        ctx,
         scenario: brief.scenario || scenario,
         description: brief.description,
-        learn: makeLearn('html', level, `Usar <${tag}> #${i + 1}`, brief.scenario || scenario, ctx),
-        starterCode: `<!-- Maqueta para ${ctx} usando <${tag}>\n\n-->`,
+        learn: makeLearn('html', level, brief.title || `Usar <${tag}>`, brief.scenario || scenario, ctx),
+        starterCode: `<!-- ${ctx}: ${brief.title || tag} -->\n\n`,
         tests,
-        hint: `Investiga cuándo usar <${tag}> y sus atributos obligatorios.`,
+        hint: `Problema y objetivo están en el enunciado. Enfócate en <${tag}> y los atributos que validan los tests.`,
         feedback: { general: fb(`Falta <${tag}> o atributos requeridos.`, 'Consulta MDN para este elemento.', 'Markup semántico en producción.') }
       });
     }

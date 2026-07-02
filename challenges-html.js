@@ -6,7 +6,17 @@ const CHALLENGES_HTML = [
     title: 'Estructura básica de página',
     scenario: null,
     description: `
-      <p>Crea el esqueleto mínimo de una página HTML válida con <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code> con un <code>&lt;title&gt;</code>, y <code>&lt;body&gt;</code> con un párrafo de bienvenida.</p>
+      <div class="exercise-brief">
+        <p class="brief-problem"><strong>Problema:</strong> Abres un archivo en el navegador y solo ves texto suelto o una página en blanco porque falta la estructura mínima que todo documento HTML debe tener.</p>
+        <p class="brief-objective"><strong>Objetivo:</strong> Crear el esqueleto válido con <code>&lt;!DOCTYPE html&gt;</code>, <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code> (con <code>&lt;title&gt;</code>) y <code>&lt;body&gt;</code> con un párrafo de bienvenida.</p>
+        <p class="brief-req-title"><strong>Requisitos concretos:</strong></p>
+        <ol class="brief-steps">
+          <li>DOCTYPE y etiqueta html con lang.</li>
+          <li>title dentro de head (no en body).</li>
+          <li>Al menos un <code>&lt;p&gt;</code> con texto en body.</li>
+        </ol>
+        <p class="brief-success"><strong>Criterio de éxito:</strong> Los tests detectan html, title en head y párrafo con contenido.</p>
+      </div>
     `,
     learn: {
       concept: 'Todo documento HTML necesita una estructura jerárquica para que el navegador lo interprete correctamente.',
@@ -45,7 +55,17 @@ const CHALLENGES_HTML = [
     title: 'Menú de navegación',
     scenario: null,
     description: `
-      <p>Crea un menú de navegación con <code>&lt;nav&gt;</code> que contenga una lista <code>&lt;ul&gt;</code> con al menos 3 enlaces <code>&lt;a&gt;</code> a secciones (pueden usar <code>href="#"</code>).</p>
+      <div class="exercise-brief">
+        <p class="brief-problem"><strong>Problema:</strong> El sitio tiene enlaces sueltos sin estructura; es difícil de estilar, poco accesible y los lectores de pantalla no reconocen la zona como navegación.</p>
+        <p class="brief-objective"><strong>Objetivo:</strong> Armar un menú con <code>&lt;nav&gt;</code> que contenga <code>&lt;ul&gt;</code> y al menos 3 <code>&lt;a&gt;</code> (pueden usar <code>href="#"</code>).</p>
+        <p class="brief-req-title"><strong>Requisitos concretos:</strong></p>
+        <ol class="brief-steps">
+          <li>nav como contenedor semántico.</li>
+          <li>ul con li por cada enlace.</li>
+          <li>Mínimo 3 enlaces con texto visible.</li>
+        </ol>
+        <p class="brief-success"><strong>Criterio de éxito:</strong> Tests verifican nav, ul, li y al menos 3 enlaces dentro.</p>
+      </div>
     `,
     learn: {
       concept: 'Las listas no ordenadas agrupan elementos relacionados; nav indica semánticamente una zona de navegación.',
@@ -77,13 +97,18 @@ const CHALLENGES_HTML = [
     title: 'Formulario de contacto',
     scenario: '🏢 Una empresa necesita captar leads en su landing page. Debes crear el formulario que enviará nombre, email y mensaje al CRM.',
     description: `
-      <p>Construye un formulario de contacto profesional con:</p>
-      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
-        <li>Campo nombre con <code>label</code> asociado</li>
-        <li>Campo email con <code>type="email"</code> y <code>required</code></li>
-        <li>Área de mensaje con <code>textarea</code></li>
-        <li>Botón de envío</li>
-      </ul>
+      <div class="exercise-brief">
+        <p class="brief-problem"><strong>Problema:</strong> La landing captura leads pero el formulario no tiene labels, validación de email ni botón de envío; falla en móvil y accesibilidad.</p>
+        <p class="brief-objective"><strong>Objetivo:</strong> Construir <code>&lt;form id="contacto"&gt;</code> con nombre (label+input), email obligatorio, textarea de mensaje y botón enviar.</p>
+        <p class="brief-req-title"><strong>Requisitos concretos:</strong></p>
+        <ol class="brief-steps">
+          <li>Label con <code>for</code> asociado al id del input.</li>
+          <li>Email con <code>type="email"</code> y <code>required</code>.</li>
+          <li>textarea para el mensaje.</li>
+          <li>button o input <code>type="submit"</code>.</li>
+        </ol>
+        <p class="brief-success"><strong>Criterio de éxito:</strong> Tests validan form#contacto, label[for], email required, textarea y submit.</p>
+      </div>
     `,
     learn: {
       concept: 'Los formularios conectan al usuario con el backend. Labels asociados mejoran accesibilidad; types correctos activan validación nativa.',
@@ -116,14 +141,18 @@ const CHALLENGES_HTML = [
     title: 'Tarjeta de producto e-commerce',
     scenario: '🛒 Tu tienda online muestra productos en grid. Cada tarjeta debe tener imagen, nombre, precio y botón de compra accesible.',
     description: `
-      <p>Crea una tarjeta de producto usando etiquetas semánticas:</p>
-      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
-        <li><code>article</code> como contenedor</li>
-        <li><code>img</code> con <code>alt</code> descriptivo</li>
-        <li><code>h2</code> para el nombre del producto</li>
-        <li><code>p</code> con clase <code>precio</code> para el precio</li>
-        <li><code>button</code> con texto "Agregar al carrito"</li>
-      </ul>
+      <div class="exercise-brief">
+        <p class="brief-problem"><strong>Problema:</strong> El catálogo muestra productos sin estructura semántica ni imagen accesible; Google y lectores de pantalla no entienden cada ítem.</p>
+        <p class="brief-objective"><strong>Objetivo:</strong> Crear una tarjeta en <code>&lt;article class="producto"&gt;</code> con imagen (alt), título h2, precio y botón de compra.</p>
+        <p class="brief-req-title"><strong>Requisitos concretos:</strong></p>
+        <ol class="brief-steps">
+          <li>img con alt descriptivo (no solo "imagen").</li>
+          <li>h2 con nombre del producto.</li>
+          <li>p con clase <code>precio</code>.</li>
+          <li>button con texto exacto "Agregar al carrito".</li>
+        </ol>
+        <p class="brief-success"><strong>Criterio de éxito:</strong> Tests comprueban article.producto, alt, h2, .precio y texto del botón.</p>
+      </div>
     `,
     learn: {
       concept: 'article representa contenido independiente y reutilizable. alt en imágenes es obligatorio para accesibilidad.',
@@ -156,13 +185,18 @@ const CHALLENGES_HTML = [
     title: 'Landing page semántica',
     scenario: '🚀 Startup lanza producto. Necesitas una landing con header, sección hero, características y footer — todo semántico para SEO.',
     description: `
-      <p>Construye la estructura de una landing usando:</p>
-      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
-        <li><code>header</code> con logo (texto) y nav</li>
-        <li><code>main</code> con <code>section#hero</code> (h1 + párrafo)</li>
-        <li><code>section#features</code> con al menos 2 <code>article</code></li>
-        <li><code>footer</code> con texto de copyright</li>
-      </ul>
+      <div class="exercise-brief">
+        <p class="brief-problem"><strong>Problema:</strong> La landing es solo divs genéricos; buscadores y tecnologías asistivas no distinguen cabecera, contenido principal ni pie.</p>
+        <p class="brief-objective"><strong>Objetivo:</strong> Maquetar la landing con landmarks HTML5: header+nav, main con secciones hero y features, y footer.</p>
+        <p class="brief-req-title"><strong>Requisitos concretos:</strong></p>
+        <ol class="brief-steps">
+          <li>header con nav (logo o texto de marca).</li>
+          <li>main &gt; section#hero con un solo h1 y párrafo.</li>
+          <li>section#features con al menos 2 article.</li>
+          <li>footer con copyright o texto legal.</li>
+        </ol>
+        <p class="brief-success"><strong>Criterio de éxito:</strong> Tests validan header nav, main, hero h1, 2+ articles en features y footer.</p>
+      </div>
     `,
     learn: {
       concept: 'HTML5 semántico comunica la estructura lógica de la página a buscadores y tecnologías asistivas.',
@@ -194,13 +228,18 @@ const CHALLENGES_HTML = [
     title: 'Dashboard accesible',
     scenario: '🏥 Un hospital usa un dashboard interno. Debe ser usable con teclado y lectores de pantalla (WCAG).',
     description: `
-      <p>Crea un dashboard accesible con:</p>
-      <ul style="margin:0.5rem 0 0.75rem 1.25rem;color:var(--text-secondary);font-size:0.875rem">
-        <li>Tabla con <code>caption</code>, <code>thead</code>, <code>tbody</code></li>
-        <li>Columnas con <code>th scope="col"</code></li>
-        <li>Botón con <code>aria-label</code> descriptivo</li>
-        <li>Enlace "Saltar al contenido" al inicio</li>
-      </ul>
+      <div class="exercise-brief">
+        <p class="brief-problem"><strong>Problema:</strong> El dashboard interno no cumple WCAG: la tabla no tiene caption ni encabezados de columna y no hay forma de saltar al contenido con teclado.</p>
+        <p class="brief-objective"><strong>Objetivo:</strong> Crear un dashboard accesible con skip link, tabla estructurada y botón con aria-label descriptivo.</p>
+        <p class="brief-req-title"><strong>Requisitos concretos:</strong></p>
+        <ol class="brief-steps">
+          <li>Enlace <code>&lt;a href="#main"&gt;</code> al inicio (saltar al contenido).</li>
+          <li>main con id="main".</li>
+          <li>table con caption, thead y tbody; th scope="col".</li>
+          <li>button con aria-label no vacío.</li>
+        </ol>
+        <p class="brief-success"><strong>Criterio de éxito:</strong> Tests verifican skip link, caption, th[scope], main#main y aria-label en botón.</p>
+      </div>
     `,
     learn: {
       concept: 'WCAG exige que la información no dependa solo del color y que todo sea navegable por teclado.',
